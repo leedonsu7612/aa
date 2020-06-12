@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.loan.service.impl.LoanMapper">
+
+	<resultMap id="sellerLoan" type="sellerLoanVO">
+		<id property="transactionNo" column="transaction_no" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="account" column="account" />
+		<result property="collectMoney" column="collect_money" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="insertDate" column="insert_date" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="companyName" column="buyer_company_name" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+			<!-- 삭제여부 -->
+			AND acnt.is_delete = 'N'
+			<!-- 진행상태 -->
+			AND acnt.progress_flag = '1'
+			<!-- 품목점 사업자번호 -->
+			<if test="sellerBizNo != null and sellerBizNo != ''">
+			AND acnt.seller_biz_no = #{sellerBizNo}
+			</if>
+			<!-- 대리점 사업자번호 -->
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			AND acnt.buyer_biz_no = #{buyerBizNo}
+			</if>
+			<!-- 발행일 -->
+			<if test="searchType == '0'.toString()">
+				<if test="startDate != null and startDate != ''">
+			AND TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM') <![CDATA[>=]]> #{startDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+			AND TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM') <![CDATA[<=]]> #{endDate}
+				</if>
+			</if>
+			<!-- 만기일 -->
+			<if test="searchType == '1'.toString()">
+				<if test="startDate != null and startDate != ''">
+			AND TO_CHAR(acnt.expiration_date::DATE, 'YYYY.MM') <![CDATA[>=]]> #{startDate}
+				</if>
+				<if test="endDate != null and endDate != ''">
+			AND TO_CHAR(acnt.expiration_date::DATE, 'YYYY.MM') <![CDATA[<=]]> #{endDate}
+				</if>
+			</if>
+			<!-- 매출 구분 -->
+			<if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+			AND acnt.group_type = #{groupType}
+			</if>
+		</where>
+	</sql>
+
+	<select id="selectSellerLoanList" parameterType="map" resultMap="sellerLoan">
+		SELECT acnt.transaction_no AS transaction_no
+			 , TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+			 , TO_CHAR(acnt.expiration_date::DATE, 'YYYY.MM.DD') AS expiration_date
+			 , TO_CHAR(acnt.payment_date::DATE, 'YYYY.MM.DD') AS payment_date
+			 , acnt.account AS account
+			 , acnt.collect_money AS collect_money
+			 , acnt.progress_flag AS progress_flag
+			 , acnt.expiration_avg AS expiration_avg
+			 , acnt.group_type AS group_type
+			 , acnt.is_delete AS is_delete
+			 , acnt.insert_date AS insert_date
+			 , acnt.seller_biz_no AS seller_biz_no
+			 , acnt.buyer_biz_no AS buyer_biz_no
+			 , memb.company_name AS buyer_company_name
+		  FROM cdf.tb_accounts_receivable_info AS acnt
+		  JOIN cdf.tb_memb_info AS memb ON memb.business_no = acnt.buyer_biz_no
+		<include refid="condition" />
+		LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<select id="selectSellerLoanListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(acnt.transaction_no)
+		  FROM cdf.tb_accounts_receivable_info AS acnt
+		  JOIN cdf.tb_memb_info AS memb ON memb.business_no = acnt.buyer_biz_no
+		<include refid="condition" />
+	</select>
+
+</mapper>

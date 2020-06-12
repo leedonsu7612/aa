@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.buyer.companysBilling.service.impl.CompanysBillingMapper">
+
+	<resultMap id="buyerCompanysBilling" type="egovframework.com.buyer.companysBilling.service.CompanysBillingVO">
+		<result property="sellerMembNo" column="seller_memb_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="sellerCompanyName" column="seller_company_name" />
+		<result property="salesAmount2" column="sales_amount2" />
+		<result property="salesAmount1" column="sales_amount1" />
+		<result property="salesAmount" column="sales_amount" />
+		<result property="collectAmount" column="collect_amount" />
+		<result property="collectAmountRate" column="collect_amount_rate" />
+		<result property="endAmount" column="end_amount" />
+		<result property="expirationAvg" column="expiration_avg" />
+	</resultMap>
+
+	<select id="selectBuyerCompanysBillingList" parameterType="map" resultMap="buyerCompanysBilling">
+		SELECT seller_memb_no
+			 , seller_biz_no
+			 , seller_company_name
+			 , sales_amount2
+			 , sales_amount1
+			 , sales_amount
+			 , collect_amount
+			 , (CASE WHEN collect_amount = 0 THEN 0 ELSE (collect_amount / sales_amount) * 100 END) AS collect_amount_rate
+			 , end_amount
+			 , expiration_avg
+		  FROM (
+			SELECT memb.memb_no AS seller_memb_no
+			     , memb.business_no AS seller_biz_no
+			     , memb.company_name AS seller_company_name
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') <![CDATA[<=]]> TO_CHAR(TO_DATE(#{startDate}, 'yyyy.mm')::date - INTERVAL '2 month', 'yyyy.mm') THEN sales.total_sales_amount${groupCode} ELSE 0 END) AS sales_amount2
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') = TO_CHAR(TO_DATE(#{startDate}, 'yyyy.mm')::date - INTERVAL '1 month', 'yyyy.mm') THEN sales.total_sales_amount${groupCode} ELSE 0 END) AS sales_amount1
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') = #{startDate} THEN sales.total_sales_amount${groupCode} ELSE 0 END) AS sales_amount
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') = #{startDate} THEN sales.total_collect_amount${groupCode} ELSE 0 END) AS collect_amount
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') = #{startDate} THEN sales.end_amount${groupCode} ELSE 0 END) AS end_amount
+			     , SUM(CASE WHEN TO_CHAR(sales.reg_date::date, 'YYYY.MM') = #{startDate} THEN sales.expiration_avg${groupCode} ELSE 0 END) AS expiration_avg
+			  FROM tb_sales_monthly_data AS sales
+			       JOIN cdf.tb_memb_info AS memb ON sales.seller_biz_no = memb.business_no
+			 WHERE sales.is_delete = 'N'
+			   AND sales.buyer_biz_no = #{buyerBizNo}
+			 GROUP BY ROLLUP ((memb.memb_no, memb.business_no, memb.company_name))
+		  ) A
+		 WHERE (A.sales_amount2 + A.sales_amount1 + A.sales_amount + A.collect_amount + A.end_amount + A.expiration_avg) <![CDATA[>]]> 0
+	</select>
+
+</mapper>

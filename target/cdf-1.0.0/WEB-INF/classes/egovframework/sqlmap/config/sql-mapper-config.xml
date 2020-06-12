@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap" />
+		<typeAlias alias="searchVO" type="egovframework.com.sample.service.SampleDefaultVO" />
+		<typeAlias alias="sampleVO" type="egovframework.com.sample.service.SampleVO" />
+		<typeAlias alias="defaultVO" type="egovframework.com.cmmn.service.DefaultVO" />
+		<typeAlias alias="memberVO" type="egovframework.com.admin.member.service.MemberVO" />
+		<typeAlias alias="loginVO" type="egovframework.com.cmmn.service.LoginVO" />
+		<typeAlias alias="registVO" type="egovframework.com.usr.service.RegistVO" />
+		<typeAlias alias="buyerCompanysBillingVO" type="egovframework.com.buyer.companysBilling.service.CompanysBillingVO" />
+		<typeAlias alias="buyerSalesBillingVO" type="egovframework.com.buyer.salesBilling.service.SalesBillingVO" />
+		<typeAlias alias="dfrdAcntsRcvbleVO" type="egovframework.com.buyer.salesBilling.service.DfrdAcntsRcvbleVO" />
+		<typeAlias alias="buyerOfficesItemVO" type="egovframework.com.buyer.officesItem.service.OfficesItemVO" />
+		<typeAlias alias="buyerMyOfficesItemVO" type="egovframework.com.buyer.myOfficesItem.service.MyOfficesItemVO" />
+		<typeAlias alias="buyerUnauthorizedVO" type="egovframework.com.buyer.unauthorized.service.UnauthorizedVO" />
+		<typeAlias alias="buyerSetOffVO" type="egovframework.com.buyer.setOff.service.SetOffVO" />
+		<typeAlias alias="buyerAccountReceivableVO" type="egovframework.com.buyer.accountReceivable.service.AccountReceivableVO" />
+		<typeAlias alias="buyerPaymentVO" type="egovframework.com.buyer.payment.service.PaymentVO" />
+		<typeAlias alias="buyerTaxBillVO" type="egovframework.com.buyer.taxBill.service.TaxBillVO" />
+		<typeAlias alias="abnormalDailyVO" type="egovframework.com.admin.abnormalDaily.service.AbnormalDailyVO" />
+		<typeAlias alias="abnormalHeeledSalesVO" type="egovframework.com.admin.abnormalHeeledSales.service.AbnormalHeeledSalesVO" />
+		<typeAlias alias="guaranteeVO" type="egovframework.com.admin.guarantee.service.GuaranteeVO" />
+		<typeAlias alias="extraCollectionVO" type="egovframework.com.admin.guarantee.service.ExtraCollectionVO" />
+		<typeAlias alias="setOffInfoVO" type="egovframework.com.admin.guarantee.service.SetOffInfoVO" />
+		<typeAlias alias="taxbillVO" type="egovframework.com.admin.guarantee.service.TaxbillVO" />
+		<typeAlias alias="salesSlipVO" type="egovframework.com.admin.guarantee.service.SalesSlipVO" />
+		
+		<typeAlias alias="sellerCompanysBillingVO" type="egovframework.com.seller.companysBilling.service.SellerBillingVO" />                                
+	</typeAliases>
+</configuration>

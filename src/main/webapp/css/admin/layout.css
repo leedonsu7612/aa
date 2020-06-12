@@ -1,0 +1,61 @@
+@charset "utf-8";
+
+/* 화면낭독기 사용자용 */
+#hd_login_msg {position:absolute;top:0;left:0;font-size:0;line-height:0;overflow:hidden}
+.msg_sound_only, .sound_only {display:inline-block !important;position:absolute;top:0;left:0; width: 0px !important; height: 0px !important; margin:0 !important;padding:0 !important;font-size:0 !important;line-height:0 !important;border:0 !important;overflow:hidden !important}
+/* 본문 바로가기 */
+#skip_to_container a {z-index:100000; position:absolute;top:0;left:0;width:1px;height:1px;font-size:0;line-height:0;overflow:hidden}
+#skip_to_container a:focus, #skip_to_container a:active {width:100%;height:75px;background:#21272e;color:#fff;font-size:2em;font-weight:bold;text-align:center;text-decoration:none;line-height:3.3em}
+
+#hd { width: 100%; min-width: 1500px; margin: 0; padding: 0; position: relative; z-index: 997; height: 80px; background: #000000; }
+#hd_h1 {position:absolute;font-size:0;line-height:0;overflow:hidden}
+
+
+#hd .head { position: relative; width: 100%; padding: 0px 20px; margin: 0 auto; overflow: hidden; }
+#hd .head .logo { float: left; line-height: 80px; }
+#hd .head .logo span { display: inline-block; vertical-align: middle; margin-left: 30px; padding-left: 30px; line-height: 20px; font-size: 24px; color: #fff; font-weight: 500; border-left: 1px solid #fff;}
+#hd .head .gnb { float: right; }
+#hd .head .gnb > ul { overflow: hidden; }
+#hd .head .gnb > ul > li { float: left; margin-top: 26px; }
+#hd .head .gnb > ul > li > a { display: block; line-height: 22px; padding: 16px 20px; font-size: 15px; color: #fff; font-family: 'YouandiModernTR', sans-serif;  }
+#hd .head .gnb > ul > li > a:hover { color:#999; }
+#hd .head .gnb > ul > li > a.active {color: #930029; background: #fff; border-radius: 5px 5px 0px 0px; -moz-border-radius: 5px 5px 0px 0px; -webkit-border-radius: 5px 5px 0px 0px;}
+
+#hd .tnb { position: absolute; right: 50px; top: 25px; }
+#hd .tnb > ul { overflow: hidden; }
+#hd .tnb > ul > li { float: left; padding: 0px 20px; background: url(../../images/common/line-tnb.png) no-repeat left center; }
+#hd .tnb > ul > li:first-child { background: none; }
+#hd .tnb > ul > li > a { font-size: 14px; color: #fff; }
+
+#hd.agency { min-width: 1200px; height: 120px;}
+#hd.agency .head { }
+#hd.agency .head .logo { margin-top: 15px; float: none; line-height: normal; text-align: center; }
+#hd.agency .head .gnb {float: none; text-align: center;}
+#hd.agency .head .gnb > ul {  }
+#hd.agency .head .gnb > ul > li { margin-left: -4px; display: inline-block; float: none; margin-top: 22px; }
+#hd.agency .head .gnb > ul > li:first-child { margin-left: 0px; }
+#hd.agency .head .gnb > ul.new_gnb > li > a { padding: 16px 10px;  }
+#hd.login .tnb { top: 31px; }
+
+
+
+#container { width: 100%; padding: 0px 20px; min-width: 1500px; margin: 0 auto; min-height: 500px; padding: 50px 0px 100px; overflow: hidden; }
+#container.agency { min-width: 1200px; }
+#pop_container { width: 100%; padding: 0px 0px; min-width: 630px; margin: 0 auto; min-height: 630px; padding: 0px 0px 0px; overflow: hidden; }
+#container.login { width: 1200px; min-width: 1200px; }
+
+#contents { width: 100%; padding: 0px 20px; margin: 0 auto;}
+#container.login #contents { padding: 0px; }
+#contents h2 { margin-top: 30px; font-size: 24px; color: #000; display: block; font-family: 'YouandiModernTR', sans-serif;  }
+#contents h3 { margin-top: 45px; font-size: 15px; color: #000; display: block; font-weight: bold; }
+
+#ft { padding: 20px 0px 50px; border-top: 1px solid #dddddd; min-width: 1500px; }
+#ft.agency { min-width: 1200px; }
+#ft .footer { width: 100%; padding: 0px 20px; margin: 0 auto; }
+#ft .footer > ul { overflow: hidden; }
+#ft .footer > ul > li { text-align: center; font-style: normal;  font-size: 13px; color: #666666; line-height: 22px; }
+#ft .footer > ul > li:first-child { margin-bottom: 10px;}
+#ft .footer > ul > li:first-child > a { margin-left: 13px;}
+#ft .footer > ul > li.ft_logo { margin-top: 20px;}
+#ft .footer address { font-style: normal;}
+#ft .footer p { font-size: 13px; color: #fff; line-height: 25px; }

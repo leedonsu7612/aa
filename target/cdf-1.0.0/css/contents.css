@@ -1,0 +1,106 @@
+@charset "utf-8";
+
+/* pew 추가 */
+.agree_wrap { width:918px; height:70px; padding:30px; font-size:12px; line-height:20px; color:#737373; margin-bottom:15px; border:1px solid #ddd; overflow:auto; font-size:14px;}
+
+/* 4 단계 step */
+.step4_wrap { width:980px; height:104px;}
+.step4_wrap.on1 { background:url(../images/common/bg_join_step01.gif) no-repeat 0 0;}
+.step4_wrap.on2 { background:url(../images/common/bg_join_step02.gif) no-repeat 0 0;}
+.step4_wrap.on3 { background:url(../images/common/bg_join_step03.gif) no-repeat 0 0;}
+.step4_wrap.on4 { background:url(../images/common/bg_join_step04.gif) no-repeat 0 0;}
+.step4_wrap li { float:left; width:155px; height:32px; padding:36px 0 36px 90px; overflow:hidden;}
+.step4_wrap li.first { width:175px; padding-left:70px;}
+.step4_wrap .tit { font-size:15px; color:#8a8a8a; font-weight:bold; line-height:32px;}
+.step4_wrap li.on .tit { color:#fff;}
+
+/* 5 단계 step */
+.step5_wrap { width:980px; height:104px;}
+.step5_wrap.on1 { background:url(../images/common/bg_b2b_step01.gif) no-repeat 0 0;}
+.step5_wrap.on2 { background:url(../images/common/bg_b2b_step02.gif) no-repeat 0 0;}
+.step5_wrap.on3 { background:url(../images/common/bg_b2b_step03.gif) no-repeat 0 0;}
+.step5_wrap.on4 { background:url(../images/common/bg_b2b_step04.gif) no-repeat 0 0;}
+.step5_wrap.on5 { background:url(../images/common/bg_b2b_step05.gif) no-repeat 0 0;}
+.step5_wrap li { float:left; width:126px; height:54px; padding:25px 0 25px 70px; overflow:hidden;}
+.step5_wrap .tit { font-size:15px; color:#8a8a8a; font-weight:bold;}
+.step5_wrap .stit { margin-top:5px; font-size:13px; color:#8a8a8a; line-height:16px;}
+.step5_wrap li.on .tit, .step5_wrap li.on .stit { color:#fff;}
+
+/* pop_5 단계 step */
+.pop_step5 { width:916px; height:94px; border-top:1px solid #492c66; border-bottom:1px solid #a3a3a3;}
+.pop_step5.on1 { background:url(../images/pop/bg_pop_step01.gif) no-repeat 0 0;}
+.pop_step5.on2 { background:url(../images/pop/bg_pop_step02.gif) no-repeat 0 0;}
+.pop_step5.on3 { background:url(../images/pop/bg_pop_step03.gif) no-repeat 0 0;}
+.pop_step5.on4 { background:url(../images/pop/bg_pop_step04.gif) no-repeat 0 0;}
+.pop_step5.on5 { background:url(../images/pop/bg_pop_step05.gif) no-repeat 0 0; }
+.pop_step5 li { float:left; width:100px; height:54px; padding:20px 0 25px 70px; overflow:hidden;}
+.pop_step5 .tit { font-size:14px; color:#8a8a8a; font-weight:bold;}
+.pop_step5 .stit { margin-top:5px; font-size:12px; color:#8a8a8a; line-height:16px;}
+.pop_step5 li.on .tit, .pop_step5 li.on .stit { color:#fff;}
+
+/* pew 추가 */
+
+.accNav {left: 0; position: absolute; top: 0; z-index: 1;}
+.accNav li {float: left; height: 30px; position: relative; width: 159px;}
+.accNav li a {border: 2px solid #000; font-weight: bold; left: -9999px; line-height: 2.17; position: absolute; text-align: center; top: 0; width: 155px;}
+.accNav li a:focus {left: 0;}
+
+/* 질문과 답변 */
+.txt_qna {width:787px; height:410px; border:1px solid #c7c9cf;}
+.faq_list {width:980px; overflow:hidden;}
+.faq_list ul {width:990px; margin-top:20px;}
+.faq_list ul:after { clear: both; content: ""; display: block;}
+.faq_list ul li {width:131px; float:left; margin-right:10px;}
+
+.faq_view { margin-top:40px; border-top:2px solid #d9d9d9; border-bottom:1px solid #d9d9d9;}
+.faq_view dt { height:34px; padding:17px 0 0 20px; font-size:15px; color:#555; font-weight:bold; border-top:1px solid #d9d9d9;}
+.faq_view dt a {color:#555;}
+.faq_view dt.first {border-top:none;}
+.faq_view dd { padding:14px 0 14px 46px; font-size:12px; color:#737373; line-height:23px; background:#f7f7f7;}
+
+/* help 페이지 상단 검색폼 박스 스타일 */
+.box03_wrap { border-top:2px solid #d9d9d9; border-bottom:1px solid #d9d9d9; background-color:#f7f7f7; padding:25px 50px;}
+.box03_wrap ul { overflow:hidden;}
+.box03_wrap ul li { float:left; width:440px; background:url(../images/ico/bar_box_03.gif) no-repeat right 5px; line-height:20px; color:#737373; font-size:12px;}
+.box03_wrap ul li.last { background:none;}
+
+/* help 페이지 */
+.faq_list {border-top:2px solid #d9d9d9;}
+.faq_list dl dt {padding:15px; border-bottom:1px solid #d9d9d9; font-size:15px; color:#555; font-weight:bold;}
+.faq_list dl .dt_first {border-bottom:0 none;}
+.faq_list dl dd {padding:20px 40px; background-color:#f7f7f7; font-size:14px; color:#737373; line-height:20px; }
+.faq_list dl .dd_first {border-bottom:1px solid #d9d9d9;}
+
+/* 로그인 */
+.login_id {width:50%; float:left; border:2px solid #d9d9d9; border-left:none 0; border-right:none 0; min-height:245px;  margin-right:-1px;}
+.login_certify {width:50%; float:right; border:2px solid #d9d9d9; border-left:1px solid #d9d9d9; border-right:none 0;  min-height:245px;}
+
+.loginBox dl {overflow:hidden;}
+.loginBox dl dt {line-height:55px; text-align:center; font-weight:bold;  background-color:#f7f7f7; font-size:14px; margin-bottom:35px;}
+.loginBox dl dd  {float:left; padding-left:35px;}
+.loginBox dl dd .tit {padding-right:15px; font-weight:bold; font-size:14px;}
+.loginBox dl dd .pb15 .tit {padding-right:30px;}
+.loginBox dl dd.lgbtn {float:right; padding-left:0; padding-right:35px;}
+.loginBox .goto {clear:both; text-align:center; padding-top:30px; *padding-top:0;}
+.loginBox .goto span {background:url(../images/ico/bar_box_01.gif) no-repeat; padding-left:10px; margin-right:5px;}
+.loginBox .goto span.fst {background:none;}
+.loginBox .goto span a {color:#353535;}
+.loginBox .goto span strong {color:#471e71;}
+
+.loginBox .login_certify dl dd  {float:left; padding-left:60px;}
+.loginBox .login_certify dl dd.lgbtn {float:right; padding-left:0; padding-right:60px;}
+.loginBox .login_certify .note {line-height:33px; background:#f8f8f8; color:#383838; padding-left:10px;}
+
+/* 회원가입 step */
+.member_reg dl {border:2px solid #d9d9d9; border-right:0 none; border-left:0 none; line-height:70px;}
+.member_reg dl dt {background:#f7f7f7; width:270px; float:left; margin-right:25px; text-align:center; font-size:14px; font-weight:bold;}
+
+.member_fin {background:#f7f7f7 url(../images/common/bg_member_fin.gif) 100% 0 no-repeat; min-height:150px; padding-left:40px;}
+.member_fin p {padding:35px 0 10px;}
+.member_fin ul li {background:url(../images/ico/bar_line_01.gif) 0 50% no-repeat; padding-left:13px; color:#737373; padding-top:2px; margin-top:7px;}
+
+.find_account {border-top:1px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+.find_account dl {overflow:hidden; border-top:1px solid #d9d9d9;}
+.find_account dl * {line-height:50px; font-size:14px; vertical-align:middle;}
+.find_account dl dt {float:left; font-size:14px; background-color:#f7f7f7; width:130px; padding-left:30px; margin-right:20px; font-weight:bold;} 
+.find_account dl dd .input {line-height:30px; vertical-align:top; margin-top:9px; *margin-top:0; *vertical-align:middle;} 

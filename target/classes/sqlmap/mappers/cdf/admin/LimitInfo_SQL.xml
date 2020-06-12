@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.admin.limitInfo.service.impl.LimitInfoMapper">
+
+	<resultMap id="limitInfo" type="limitInfoVO">
+		<result property="companyName" column="company_name"/>
+		<result property="membNo" column="memb_no"/>
+		<result property="ceoName" column="ceo_name"/>
+		<result property="bizPlace" column="biz_place"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="comSttsCd" column="company_status_code"/>
+		<result property="lastDate" column="last_date"/>
+		<result property="mobisLimit" column="mobis_limit"/>
+		<result property="hciLimit" column="hci_limit"/>
+		<result property="salesLimit" column="sales_limit"/>
+		<result property="remLimit" column="remaining_limit"/>
+		<result property="overLimit" column="over_limit"/>
+		<result property="guaranteeOver" column="guarantee_over"/>
+		<result property="guaranteePrice" column="guarantee_price"/>
+		<result property="notarialPrice" column="notarial_price"/>
+		<result property="reqId" column="req_id"/>
+		<result property="lmtReqGbn" column="lmt_req_gbn"/>
+		<result property="processNo" column="process_no"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="reqDate" column="req_date"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<resultMap id="limitRequest" type="limitRequestVO">
+		<result property="reqId" column="req_id"/>
+		<result property="membNo" column="memb_no"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="companyName" column="company_name"/>
+		<result property="lmtReqGbn" column="lmt_req_gbn"/>
+		<result property="processNo" column="process_no"/>
+		<result property="reqLimit" column="req_limit"/>
+		<result property="fixAt" column="fix_at"/>
+		<result property="attchFileId" column="attch_file_id"/>
+		<result property="rcvBizNo" column="rcv_biz_no"/>
+		<result property="rcvCoNm" column="rcv_co_nm"/>
+		<result property="rcvMembNo" column="rcv_memb_no"/>
+		<result property="rcvMembYn" column="rcv_memb_yn"/>
+		<result property="rcvType" column="rcv_type"/>
+		<result property="memo" column="memo"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="salesLimit" column="sales_limit"/>
+		<result property="remLimit" column="remaining_limit"/>
+		<result property="overLimit" column="over_limit"/>
+		<result property="guaranteeOver" column="guarantee_over"/>
+		<result property="guaranteePrice" column="guarantee_price"/>
+		<result property="bizPlace" column="biz_place"/>
+		<result property="notarialPrice" column="notarial_price"/>
+	</resultMap>
+
+	<resultMap id="limitHistory" type="limitHistoryVO">
+		<result property="reqId" column="req_id"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="companyName" column="company_name"/>
+		<result property="lmtReqGbn" column="lmt_req_gbn"/>
+		<result property="processNo" column="process_no"/>
+		<result property="reqLimit" column="req_limit"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="salesLimit" column="sales_limit"/>
+	</resultMap>
+
+	<resultMap id="approvaledRequest" type="limitRequestVO">
+		<result property="reqId" column="req_id"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="reqLimit" column="req_limit"/>
+		<result property="overLimit" column="over_limit"/>
+		<result property="guaranteePrice" column="guarantee_price"/>
+		<result property="salesLimit" column="sales_limit"/>
+	</resultMap>
+
+	<select id="selectLimitInfoList" parameterType="limitInfoVO" resultMap="limitInfo">
+
+			with recursive buyer_limit(company_name, memb_no, ceo_name, biz_place, business_no, company_status_code, last_date
+								, mobis_limit, hci_limit, sales_limit, remaining_limit, over_limit
+								, guarantee_over, guarantee_price, notarial_price
+								, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo
+								, _level, _path, _cycle, rnk) as(
+				with limit_info as (
+						select A.company_name, A.memb_no, A.ceo_name, B.biz_place, A.business_no, A.company_status_code
+							, (CASE WHEN LENGTH(A.last_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.last_date::date, '(YYYY-MM-DD)') END) as last_date
+							, (B.sales_limit - B.hci_limit) as mobis_limit, B.hci_limit, B.sales_limit, B.remaining_limit, B.over_limit
+							, 0 as guarantee_over, 0 as guarantee_price, B.notarial_price
+							, C.req_id, C.lmt_req_gbn, C.process_no, (CASE WHEN C.reg_date is null THEN '-' ELSE TO_CHAR(C.reg_date, '(YYYY-MM-DD)HH24MISS') END) as reg_date, C.rcv_biz_no, C.memo
+						from tb_memb_info A 
+							left outer join (
+								select business_no, sales_limit, remaining_limit, over_limit, hci_limit, notarial_price, biz_place
+								from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk1
+									from tb_buyer_limit_info 
+									where is_delete = 'N') BB
+								where rnk1 = 1
+								) B on A.business_no = B.business_no 
+							left outer join (
+								select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo
+								from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk2
+									from tb_buyer_limit_request 
+									where is_delete = 'N') CC
+								where rnk2 = 1
+								) C on C.business_no = A.business_no and C.process_no <![CDATA[ > ]]> 0
+						where A.is_delete = 'N' and A.memb_class = 'B'
+				<if test="searchKeyword != null and searchKeyword != ''">
+			        <choose>
+			            <when test="searchCondition == 0">
+							AND	A.company_name LIKE '%' || #{searchKeyword} || '%'
+						</when>
+			            <when test="searchCondition == 1">
+							AND	A.memb_no = #{searchKeyword}
+						</when>
+			            <when test="searchCondition == 2">
+							AND	A.business_no LIKE '%' || #{searchKeyword} || '%'
+						</when>
+					</choose>
+				</if>
+				<if test="rcvAt != null and rcvAt != '' and rcvAt != 1">
+							AND (C.rcv_biz_no is null or C.rcv_biz_no = '' )
+				</if>
+				)
+				select 	AA.company_name, AA.memb_no, AA.ceo_name, AA.biz_place, AA.business_no, AA.company_status_code, AA.last_date
+					, AA.mobis_limit, AA.hci_limit, AA.sales_limit, AA.remaining_limit, AA.over_limit
+					, AA.guarantee_over, AA.guarantee_price, AA.notarial_price
+					, AA.req_id, AA.lmt_req_gbn, AA.process_no, AA.reg_date, AA.rcv_biz_no, AA.memo
+					, 0, array[AA.business_no::bigint], false, row_number() over(order by AA.reg_date desc)
+				from limit_info AA where (AA.rcv_biz_no is null or AA.rcv_biz_no = '' )
+				union all
+				select 	AA.company_name, AA.memb_no, AA.ceo_name, AA.biz_place, AA.business_no, AA.company_status_code, AA.last_date
+					, AA.mobis_limit, AA.hci_limit, AA.sales_limit, AA.remaining_limit, AA.over_limit
+					, AA.guarantee_over, AA.guarantee_price, AA.notarial_price
+					, AA.req_id, AA.lmt_req_gbn, AA.process_no, AA.reg_date, AA.rcv_biz_no, AA.memo
+					, _level+1, _path||(AA.business_no::bigint), (AA.business_no::bigint) = any(_path), rnk
+				from limit_info AA, buyer_limit BB where AA.rcv_biz_no = BB.business_no and not BB._cycle
+			)
+			select lpad('┖',_level) || company_name as company_name, memb_no, ceo_name, biz_place, business_no
+				, company_status_code, last_date
+				, mobis_limit, hci_limit, sales_limit, remaining_limit, over_limit
+				, guarantee_over, guarantee_price, notarial_price
+				, req_id, lmt_req_gbn, process_no
+				, (CASE WHEN reg_date <![CDATA[ <> ]]> '-' THEN substring(reg_date, 1, 12) END) as reg_date, memo, '-' as req_date, _path, rnk
+			from buyer_limit
+			order by rnk, _path
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectLimitInfoListTotCnt" parameterType="limitInfoVO" resultType="int">
+
+			select COUNT(A.memb_no) as totcnt
+			from tb_memb_info A
+				left outer join (select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo
+					from (select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo 
+						, row_number() over (partition by business_no order by reg_date desc) as rnk2
+					from tb_buyer_limit_request 
+					where is_delete = 'N') CC
+					where rnk2 = 1) C on C.business_no = A.business_no and C.process_no <![CDATA[ > ]]> 0
+			where A.is_delete = 'N' and A.memb_class = 'B'
+		<if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 0">
+					AND	A.company_name LIKE '%' || #{searchKeyword} || '%'
+				</when>
+	            <when test="searchCondition == 1">
+					AND	A.memb_no = #{searchKeyword}
+				</when>
+	            <when test="searchCondition == 2">
+					AND	A.business_no LIKE '%' || #{searchKeyword} || '%'
+				</when>
+			</choose>
+		</if>
+		<if test="rcvAt != null and rcvAt != '' and rcvAt != 1">
+					AND (C.rcv_biz_no is null or C.rcv_biz_no = '' )
+		</if>
+			
+	</select>
+
+	<select id="selectLimitApprovalList" parameterType="limitInfoVO" resultMap="limitInfo">
+
+			with recursive buyer_limit(company_name, memb_no, ceo_name, biz_place, business_no, company_status_code, last_date
+								, mobis_limit, hci_limit, sales_limit, remaining_limit, over_limit
+								, guarantee_over, guarantee_price, notarial_price
+								, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo, req_date
+								, _level, _path, _cycle, rnk) as(
+				with limit_info as (
+						select A.company_name, A.memb_no, A.ceo_name, B.biz_place, A.business_no, A.company_status_code
+							, (CASE WHEN LENGTH(A.last_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.last_date::date, '(YYYY-MM-DD)') END) as last_date
+							, (B.sales_limit - B.hci_limit) as mobis_limit, B.hci_limit, B.sales_limit, B.remaining_limit, B.over_limit
+							, 0 as guarantee_over, 0 as guarantee_price, B.notarial_price
+							, C.req_id, C.lmt_req_gbn, C.process_no, (CASE WHEN C.reg_date is null THEN '-' ELSE TO_CHAR(C.reg_date, '(YYYY-MM-DD)HH24MISS') END) as reg_date
+							, C.rcv_biz_no, C.memo, TO_CHAR(D.reg_date, 'YYYY-MM-DD') as req_date
+						from tb_memb_info A 
+							left outer join (
+								select business_no, sales_limit, remaining_limit, over_limit, hci_limit, notarial_price, biz_place
+								from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk1
+									from tb_buyer_limit_info 
+									where is_delete = 'N') BB
+								where rnk1 = 1
+								) B on A.business_no = B.business_no 
+							join (
+								select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo
+								from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk2
+									from tb_buyer_limit_request 
+									where is_delete = 'N') CC
+								where rnk2 = 1
+								) C on C.business_no = A.business_no and (C.process_no between 1 and 99)
+							left outer join tb_buyer_limit_request D on C.req_id = D.req_id and D.process_no = 1
+						where A.is_delete = 'N' and A.memb_class = 'B' AND C.reg_date is not null
+							AND (TO_CHAR(C.reg_date, 'YYYY.MM.DD') between #{searchFromDate} and #{searchToDate} )
+				<if test="searchCondition != null and searchCondition != '' and searchCondition != 0">
+							AND	C.lmt_req_gbn = 'LM0' || #{searchCondition}
+				</if>
+				<if test="searchKeyword != null and searchKeyword != ''">
+							AND	A.company_name LIKE '%' || #{searchKeyword} || '%'
+				</if>
+				<if test="rcvAt != null and rcvAt != '' and rcvAt != 1">
+							AND (C.rcv_biz_no is null or C.rcv_biz_no = '' )
+				</if>
+				)
+				<if test="searchCondition != 4">
+				select 	AA.company_name, AA.memb_no, AA.ceo_name, AA.biz_place, AA.business_no, AA.company_status_code, AA.last_date
+					, AA.mobis_limit, AA.hci_limit, AA.sales_limit, AA.remaining_limit, AA.over_limit
+					, AA.guarantee_over, AA.guarantee_price, AA.notarial_price
+					, AA.req_id, AA.lmt_req_gbn, AA.process_no, AA.reg_date, AA.rcv_biz_no, AA.memo, AA.req_date
+					, 0, array[AA.business_no::bigint], false, row_number() over(order by AA.reg_date desc)
+				from limit_info AA where (AA.rcv_biz_no is null or AA.rcv_biz_no = '' )
+				union all
+				select 	AA.company_name, AA.memb_no, AA.ceo_name, AA.biz_place, AA.business_no, AA.company_status_code, AA.last_date
+					, AA.mobis_limit, AA.hci_limit, AA.sales_limit, AA.remaining_limit, AA.over_limit
+					, AA.guarantee_over, AA.guarantee_price, AA.notarial_price
+					, AA.req_id, AA.lmt_req_gbn, AA.process_no, AA.reg_date, AA.rcv_biz_no, AA.memo, AA.req_date
+					, _level+1, _path||(AA.business_no::bigint), (AA.business_no::bigint) = any(_path), rnk
+				from limit_info AA, buyer_limit BB where AA.rcv_biz_no = BB.business_no and not BB._cycle
+				</if>
+				<if test="searchCondition == 4">
+				select 	AA.company_name, AA.memb_no, AA.ceo_name, AA.biz_place, AA.business_no, AA.company_status_code, AA.last_date
+					, AA.mobis_limit, AA.hci_limit, AA.sales_limit, AA.remaining_limit, AA.over_limit
+					, AA.guarantee_over, AA.guarantee_price, AA.notarial_price
+					, AA.req_id, AA.lmt_req_gbn, AA.process_no, AA.reg_date, AA.rcv_biz_no, AA.memo, AA.req_date
+					, 0, array[AA.business_no::bigint], false, row_number() over(order by AA.reg_date desc)
+				from limit_info AA
+				</if>
+			)
+			select lpad('┖',_level) || company_name as company_name, memb_no, ceo_name, biz_place, business_no
+				, company_status_code, last_date
+				, mobis_limit, hci_limit, sales_limit, remaining_limit, over_limit
+				, guarantee_over, guarantee_price, notarial_price
+				, req_id, lmt_req_gbn, process_no
+				, (CASE WHEN reg_date <![CDATA[ <> ]]> '-' THEN substring(reg_date, 1, 12) END) as reg_date, memo, req_date, _path, rnk
+			from buyer_limit
+			order by rnk, _path
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectLimitApprovalListTotCnt" parameterType="limitInfoVO" resultType="int">
+
+			select COUNT(A.memb_no) as totcnt
+			from tb_memb_info A
+				join (select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo
+					from (select business_no, req_id, lmt_req_gbn, process_no, reg_date, rcv_biz_no, memo 
+						, row_number() over (partition by business_no order by reg_date desc) as rnk2
+					from tb_buyer_limit_request 
+					where is_delete = 'N') CC
+					where rnk2 = 1) C on C.business_no = A.business_no and (C.process_no between 1 and 99)
+			where A.is_delete = 'N' and A.memb_class = 'B' AND C.reg_date is not null
+				AND (TO_CHAR(C.reg_date, 'YYYY.MM.DD') between #{searchFromDate} and #{searchToDate} )
+			<if test="searchCondition != null and searchCondition != '' and searchCondition != 0">
+						AND	C.lmt_req_gbn = 'LM0' || #{searchCondition}
+			</if>
+			<if test="searchKeyword != null and searchKeyword != ''">
+						AND	A.company_name LIKE '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="rcvAt != null and rcvAt != '' and rcvAt != 1">
+						AND (C.rcv_biz_no is null or C.rcv_biz_no = '' )
+			</if>
+			
+	</select>
+
+	<select id="selectLimitRequest" parameterType="limitRequestVO" resultMap="limitRequest">
+			select B.req_id, A.memb_no, A.business_no, A.company_name, B.lmt_req_gbn, B.process_no, B.req_limit
+				, B.fix_at, B.attch_file_id, B.rcv_biz_no, D.company_name as rcv_co_nm, D.memb_no as rcv_memb_no, B.rcv_memb_yn, B.rcv_type, B.memo, B.reg_date
+				, C.sales_limit, C.remaining_limit, C.over_limit, 0 as guarantee_over, 0 as guarantee_price, B.biz_place, B.notarial_price
+			from tb_memb_info A
+				left outer join (select req_id, business_no, lmt_req_gbn, process_no, req_limit
+								, fix_at, attch_file_id, rcv_biz_no, rcv_memb_yn, rcv_type, memo, reg_date, biz_place, notarial_price
+					from (select req_id, business_no, lmt_req_gbn, process_no, req_limit
+								, fix_at, attch_file_id, rcv_biz_no, rcv_memb_yn, rcv_type, memo, reg_date, biz_place, notarial_price
+								, row_number() over (partition by business_no order by reg_date desc) as rnk
+							from tb_buyer_limit_request
+							where is_delete = 'N') BB
+					where rnk = 1) B on B.business_no = A.business_no and (B.process_no between 1 and 99)
+				left outer join (
+						select business_no, sales_limit, remaining_limit, over_limit, hci_limit, notarial_price, biz_place
+						from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk1
+							from tb_buyer_limit_info 
+							where is_delete = 'N') CC
+						where rnk1 = 1
+					) C on A.business_no = C.business_no
+				left outer join	tb_memb_info D on B.rcv_biz_no = D.business_no and D.is_delete = 'N'
+			where A.is_delete = 'N'
+				and A.business_no = #{businessNo}
+	</select>
+	
+	<select id="selectLimitHistoryList" parameterType="memberVO" resultMap="limitHistory">
+
+			select A.req_id, A.business_no, A.lmt_req_gbn, A.process_no, A.req_limit
+				, (TO_CHAR(A.reg_date, 'YYYY-MM-DD HH24:MI:SS')) as reg_date
+			from	(select req_id, business_no, lmt_req_gbn, process_no, req_limit, reg_date
+					from (select *, row_number() over (partition by req_id order by reg_date desc) as rnk
+						from tb_buyer_limit_request
+						where is_delete = 'N' and business_no = #{businessNo}) AA
+					where rnk = 1) A
+			 where 1=1
+			 order by A.reg_date desc
+			 LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectLimitHistoryListTotCnt" parameterType="memberVO" resultType="int">
+
+			select count(A.req_id)
+			from	(select req_id, business_no, lmt_req_gbn, process_no, req_limit, reg_date
+					from (select *, row_number() over (partition by req_id order by reg_date desc) as rnk
+						from tb_buyer_limit_request
+						where is_delete = 'N' and business_no = #{businessNo}) AA
+					where rnk = 1) A
+			 where 1=1
+			
+	</select>
+
+	<!-- 한도요청 추가 -->
+	<insert id="insertLimitRequest" parameterType="limitRequestVO">
+		INSERT INTO tb_buyer_limit_request (
+			req_id
+		  , business_no
+		  , lmt_req_gbn
+		  , process_no
+		  , sales_limit
+		  , req_limit
+		  , fix_at
+		  , attch_file_id
+		  , rcv_biz_no
+		  , rcv_memb_yn
+		  , rcv_type
+		  , biz_place
+		  , notarial_price
+		  , memo
+		  , reg_date
+		  , is_delete
+		)
+		VALUES
+		(
+			#{reqId}
+		  ,	#{businessNo}
+		  ,	#{lmtReqGbn}
+		  ,	#{processNo}
+		  ,	#{salesLimit}
+		  ,	#{reqLimit}
+		  ,	#{fixAt}
+		  ,	#{attchFileId}
+		  ,	#{rcvBizNo}
+		  ,	#{rcvMembYn}
+		  ,	#{rcvType}
+		  ,	#{bizPlace}
+		  ,	#{notarialPrice}
+		  ,	#{memo}
+		  , NOW()
+		  , 'N'
+		)
+	</insert>
+	<!-- // 한도요청 추가 -->
+	
+	<delete id="deleteLimitRequest" parameterType="String">
+
+			DELETE FROM tb_buyer_limit_request
+			WHERE req_id=#{reqId}
+
+	</delete>
+
+	<!-- 한도관리 추가 (24시간후 기록)
+	
+CREATE OR REPLACE FUNCTION cdf.check_limit_request()
+RETURNS void
+AS $function$ 
+declare
+	rlmt RECORD;
+	cur_limit cursor for
+		select A.req_id, A.business_no, A.lmt_req_gbn, A.req_limit, A.fix_at, A.rcv_biz_no, A.biz_place, A.notarial_price, A.reg_date 
+			, B.sales_limit, B.remaining_limit, B.over_limit, B.hci_limit
+		from
+			(select * 
+				from (
+					select *, row_number() over (partition by business_no order by reg_date desc) as rnk1
+						from tb_buyer_limit_request
+						where is_delete = 'N'
+				) AA
+				where rnk1 = 1 and process_no = 6) A
+			left outer join (
+				select *
+				from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk2
+					from tb_buyer_limit_info 
+					where is_delete = 'N') BB
+				where rnk2 = 1
+			) B on A.business_no = B.business_no
+		where (now() - A.reg_date) > interval '1 day';
+	
+begin
+	open cur_limit;
+	
+	loop
+		fetch cur_limit into rlmt;
+		exit when not found;
+		
+		insert into tb_buyer_limit_request(req_id, business_no, lmt_req_gbn, process_no, sales_limit, req_limit, fix_at, rcv_memb_yn, reg_date, is_delete) 
+		values (rlmt.req_id, rlmt.business_no, rlmt.lmt_req_gbn, 100, rlmt.sales_limit, rlmt.req_limit, 'N', 'N', now(), 'N');
+		
+		insert into tb_buyer_limit_info(reg_date, business_no, sales_limit, hci_limit, remaining_limit, over_limit, is_delete, biz_place, notarial_price) 
+		values (to_char(now(),'YYYYMM'), rlmt.business_no, rlmt.req_limit, 0, rlmt.req_limit, 0, 'N', rlmt.biz_place, rlmt.notarial_price);
+
+		insert into hist_byr_lmt_chg(req_id, reg_date, business_no, bf_sales, bf_remain, bf_over, chg_sales, chg_remain, chg_over, chg_date, is_delete, input_date) 
+		values (rlmt.req_id, to_char(now(),'YYYYMM'), rlmt.business_no, rlmt.sales_limit, rlmt.remaining_limit, rlmt.over_limit, rlmt.req_limit, rlmt.req_limit, 0, to_char(now(),'YYYYMMDD'), 'N', to_char(now(),'YYYYMMDDHH24MISS'));
+	end loop;
+
+	close cur_limit;
+
+end;
+ $function$
+ LANGUAGE plpgsql;
+	-->
+	<select id="selectOver1DayApprovalList" resultMap="approvaledRequest">
+
+		select A.req_id, A.business_no, A.req_limit, B.sales_limit, 0 as over_limit, 0 as guarantee_price
+		from
+			(select * 
+				from (
+					select *, row_number() over (partition by business_no order by reg_date desc) as rnk1
+						from tb_buyer_limit_request
+						where is_delete = 'N'
+				) AA
+				where rnk1 = 1 and process_no = 6) A
+			left outer join (
+				select *
+				from (select *, row_number() over (partition by business_no order by reg_date desc) as rnk2
+					from tb_buyer_limit_info 
+					where is_delete = 'N') BB
+				where rnk2 = 1
+			) B on A.business_no = B.business_no
+		where (now() - A.reg_date) <![CDATA[ > ]]> interval '1 day'
+			
+	</select>
+
+	<insert id="checkLimitRequest">
+		select check_limit_request()
+	</insert>
+	<!-- // 한도관리 추가 -->
+	
+</mapper>

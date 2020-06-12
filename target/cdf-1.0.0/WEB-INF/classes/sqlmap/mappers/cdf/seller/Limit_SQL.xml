@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.limit.service.impl.SellerLimitMapper">
+
+	<resultMap id="sellerLimit" type="buyerLimitVO">
+		<result property="regDate" column="reg_date" />
+		<result property="businessNo" column="business_no" />
+		<result property="salesLimit" column="sales_limit" />
+		<result property="remainingLimit" column="remaining_limit" />
+		<result property="overLimit" column="over_limit" />
+		<result property="isDelete" column="is_delete" />
+		<result property="hciLimit" column="hci_limit" />
+		<result property="bizPlace" column="biz_place" />
+		<result property="notarialPrice" column="notarial_price" />
+		<result property="companyName" column="company_name" />
+		<result property="membNo" column="memb_no" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			AND lim.business_no = #{buyerBizNo}
+			</if>
+			<if test="searchDate != null and searchDate != ''">
+			AND lim.reg_date = TO_CHAR(TO_DATE(#{searchDate}, 'yyyy.mm')::DATE, 'yyyymm')
+			</if>
+		</where>
+	</sql>
+
+	<sql id="from">
+		  FROM cdf.tb_buyer_limit_info AS lim
+		  JOIN cdf.tb_memb_info AS memb ON lim.business_no = memb.business_no
+		  JOIN cdf.tb_sales_monthly_data AS sales ON sales.seller_biz_no = #{sellerBizNo}
+		   AND lim.business_no = sales.buyer_biz_no
+		   AND TO_CHAR(sales.reg_date::DATE, 'yyyymm') = lim.reg_date
+	</sql>
+
+	<select id="selectSellerLimitList" parameterType="map" resultMap="com.hyundai.buyer.salesBilling.service.impl.SalesBillingMapper.buyerSalesBillingLimit">
+		SELECT memb.company_name AS company_name
+			 , memb.memb_no AS memb_no
+			 , memb.business_no AS business_no
+			 , COALESCE(lim.sales_limit, 0) AS sales_limit
+			 , COALESCE(lim.remaining_limit, 0) AS remaining_limit
+			 , COALESCE(lim.over_limit, 0) AS over_limit
+		<include refid="from" />
+		<include refid="condition" />
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<select id="selectSellerLimitListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(memb.company_name)
+		<include refid="from" />
+		<include refid="condition" />
+	</select>
+
+</mapper>

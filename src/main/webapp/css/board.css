@@ -1,0 +1,78 @@
+@charset "utf-8";
+
+/* PEW 추가 */
+
+/* view2 */
+table.tbl_regist_view2 { border-top:2px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+table.tbl_regist_view2 th { border-bottom:1px solid #d9d9d9; background-color:#f7f7f7; text-align:left; font-size:14px; font-weight:bold; color:#555; padding:0 20px;}
+table.tbl_regist_view2 td { padding:15px 0 15px 20px; border-bottom:1px solid #d9d9d9; font-size:15px; text-align:left; color:#555;}
+
+/* PEW 추가 */
+
+/* 검색조건 내가 수정 */
+table.tbl_search { border-top:2px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+table.tbl_search th { background-color:#f7f7f7; text-align:center; font-size:12px; font-weight:bold; color:#555;}
+table.tbl_search td { padding:10px 0 10px 24px; font-size:15px; color:#000;}
+
+
+/* 업체별지급현황 상단 검색폼 CSS */
+table.tbl_search02 { border-top:2px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+table.tbl_search02 th { background-color:#f7f7f7; text-align:center; font-size:12px; font-weight:bold; color:#555;}
+table.tbl_search02 td { padding:10px 0 10px 24px; font-size:15px; color:#000;}
+
+table.tbl_popsearch { }
+table.tbl_popsearch th { background-color:#f7f7f7; text-align:center; font-size:12px; font-weight:bold; color:#555;}
+table.tbl_popsearch td { background-color:#fff; padding:20px 0 20px 40px; font-size:12px;}
+
+/* view2 내가 수정 */
+table.tbl_view2 { border-top:2px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+table.tbl_view2 th { padding:8px 0 8px 20px;  border-bottom:1px solid #d9d9d9; background-color:#f7f7f7; text-align:left; font-size:12px; font-weight:bold; color:#555;}
+table.tbl_view2 span{position:absolute;right:30px;color:#ff4e4e;}
+table.tbl_view2 td { padding:8px 0 8px 20px; border-bottom:1px solid #d9d9d9; font-size:12px; text-align:left; color:#555;}
+table.tbl_view2_1 {background-color:none;}
+.payment_w a {color:#ff4e4e;}
+table.tbl_view2 th.tbl_center {text-align:center;}
+
+.pay_info { position:absolute; top:160px; left:600px; border:1px solid #d9d9d9;display:none;}
+.pay_info th { width:120px; height:30px; background-color:#f7f7f7; text-align:left; padding:8px 0 8px 20px; border-bottom:1px solid #d9d9d9;}
+.pay_info td { width:100px; height:30px; background-color:#FFF; padding:8px 0 8px 20px;}
+
+/* pay_info 추가 */
+.pay_info2 { position:absolute; top:135px; left:550px; border:1px solid #d9d9d9;display:none;}
+.pay_info2 th { width:100px; height:30px; background-color:#f7f7f7; text-align:left; padding:8px 0 8px 20px; border-bottom:1px solid #d9d9d9;}
+.pay_info2 td { width:100px; height:30px; background-color:#FFF; padding:8px 0 8px 20px;}
+
+.pay_info3 { position:absolute; border:1px solid #d9d9d9;display:none;}
+.pay_info3 th { width:100px; height:30px; background-color:#f7f7f7; text-align:left; padding:8px 0 8px 20px; border-bottom:1px solid #d9d9d9;}
+.pay_info3 td { width:100px; height:30px; background-color:#FFF; padding:8px 0 8px 20px;}
+
+.pay_info4 { position:absolute; border:1px solid #d9d9d9;display:none;}
+.pay_info4 th { width:100px; height:30px; background-color:#f7f7f7; text-align:left; padding:8px 0 8px 20px; border-bottom:1px solid #d9d9d9;}
+.pay_info4 td { width:100px; height:30px; background-color:#FFF; padding:8px 0 8px 20px;}
+
+/* align 추가 */
+table.tbl_view2 td.text_center {text-align:center;}
+table.tbl_view2 td.money_right {text-align:right;}
+
+/* view3 내가 수정 */
+table.tbl_view2_2 { border-top:2px solid #d9d9d9; border-bottom:2px solid #d9d9d9;}
+table.tbl_view2_2 th { padding:8px 0 8px 10px; border-bottom:1px solid #d9d9d9; background-color:#f7f7f7; text-align:left; font-size:12px; font-weight:bold; color:#555;}
+table.tbl_view2_2 td { padding:8px 0 8px 10px; border-bottom:1px solid #d9d9d9; font-size:12px; text-align:left; color:#555;}
+.payment_w a {color:#ff4e4e;}
+table.tbl_view2_2 th.tbl_center {text-align:center;}
+
+.receip_tb01, .receip_tb06 { width:60px;}
+.receip_tb02, .receip_tb07 { width:70px;}
+.receip_tb03, .receip_tb08 { width:130px;}
+.receip_tb04, .receip_tb09 { width:100px;}
+.receip_tb05, .receip_tb10 { width:130px;}
+
+/* help버튼 absolute로 띄워서 위치한 페이지 용 css */
+.help_btn{position:absolute; right:21px; top:-21px;}/* 상단 검색폼이 세로 2칸 이상으로 표현된 곳 중 내용이 가장 많은 곳 사용 */
+.help_btn1{position:absolute; right:9px; top:-21px;}/* 상단 검색폼이 세로 2칸 이상으로 표현된 곳 중 내용이 일부 빠진 곳 사용 */
+.help_btn2{position:absolute; right:-97px; top:0px;}/* 업체별 지급현황에 사용됨*/
+.help_btn3{position:absolute; right:-15px; top:0px;}/* 업체별 지급현황에 사용됨 세금계산서 등록조회페이지의 help 버튼에 사용됨 */
+.help_btn4{position:absolute; right:35px; top:0px;}/* 기타지급 승인*/
+.help_btn5{position:absolute; right:30px; top:-21px;}/* 상단 검색폼이 세로 2칸 이상으로 표현된 곳 중 내용이 가장 많은 곳 사용 - 결제내역조회는 좀 특이 */
+.help_btn6{position:absolute; right:16px; top:0px;}/* 사업자목록조회 */
+.help_btn7{position:absolute; right:23px; top:0px;}/* 거래처 한도조회 */

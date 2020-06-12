@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.buyer.unauthorized.service.impl.UnauthorizedMapper">
+
+	<resultMap id="buyerUnauthorized" type="buyerUnauthorizedVO">
+		<result property="transactionNo" column="transaction_no" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="amount" column="amount" />
+		<result property="collectMoney" column="collect_money" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="salesDate" column="sales_date" />
+	</resultMap>
+
+	<resultMap id="buyerUnauthorizedListResultMap" type="buyerUnauthorizedVO" extends="buyerUnauthorized">
+		<association property="seller" javaType="memberVO" resultMap="egovframework.com.admin.member.service.impl.MemberMapper.member" columnPrefix="memb_" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+		   AND extra.is_delete = 'N'
+		   AND extra.buyer_biz_no = #{buyerBizNo}
+		   AND extra.sales_date = TO_CHAR(TO_DATE(#{searchDate}, 'yyyy.mm')::date, 'yyyymm')
+		   <if test="businessNo != null and businessNo != ''">
+		   AND extra.seller_biz_no = #{businessNo}
+		   </if>
+		</where>
+	</sql>
+
+	<select id="selectBuyerUnauthorizedList" parameterType="map" resultMap="buyerUnauthorizedListResultMap">
+		SELECT extra.transaction_no AS transaction_no
+		     , extra.issue_date AS issue_date
+		     , extra.expiration_date AS expiration_date
+		     , extra.payment_date AS payment_date
+		     , extra.amount AS amount
+		     , extra.collect_money AS collect_money
+		     , extra.progress_flag AS progress_flag
+		     , extra.expiration_avg AS expiration_avg
+		     , extra.group_type AS group_type
+		     , extra.is_delete AS is_delete
+		     , extra.taxbill_no AS taxbill_no
+		     , extra.seller_biz_no AS seller_biz_no
+		     , extra.buyer_biz_no AS buyer_biz_no
+		     , extra.sales_date AS sales_date
+		     , memb.company_name AS memb_company_name
+		     , memb.business_no AS memb_business_no
+		     , memb.memb_no AS memb_memb_no
+		  FROM tb_extra_collection_info AS extra
+		  JOIN tb_memb_info AS memb ON memb.business_no = extra.seller_biz_no
+		<include refid="condition" />
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<select id="selectBuyerUnauthorizedListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(transaction_no)
+		  FROM tb_extra_collection_info AS extra
+		  JOIN tb_memb_info AS memb ON memb.business_no = extra.seller_biz_no
+		<include refid="condition" />
+	</select>
+
+</mapper>

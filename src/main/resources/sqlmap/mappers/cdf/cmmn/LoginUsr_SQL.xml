@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.cmmn.service.impl.LoginMapper">
+<!--
+	수정일                 수정자                          수정내용
+  =========     =======    =================================================
+  2018.11.15   	CDF Team     	 	최초
+-->
+
+	<!-- 로그인 처리를 위한 resultMap -->
+	<resultMap id="login" type="com.hyundai.cmmn.service.LoginVO">
+		<result property="userId" column="user_id"/>
+		<result property="userPw" column="user_pw"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="membClass" column="memb_class"/>
+		<result property="companyName" column="company_name"/>
+		<result property="lastDate" column="last_date"/>
+	</resultMap>
+
+	<!-- 아이디 찾기를 위한 resultMap -->
+	<resultMap id="id" type="com.hyundai.cmmn.service.LoginVO">
+		<result property="userId" column="user_id"/>
+	</resultMap>
+
+	<!-- 비밀번호 처리를 위한 resultMap -->
+	<resultMap id="password" type="com.hyundai.cmmn.service.LoginVO">
+		<result property="userPw" column="user_pw"/>
+	</resultMap>
+
+	<!-- SSO용 ESNTL_ID를 이용한 로그인(2011.8.26) -->
+
+	<select id="actionSSOLogin" resultMap="login">
+	/* sso 로그인 */
+		<![CDATA[
+		SELECT A.USER_ID
+		     , A.USER_PW
+		     , B.BUSINESS_NO
+		     , B.MEMB_CLASS
+		     , B.COMPANY_NAME
+		     , B.LAST_DATE
+		  FROM cdf.TB_MEMB_ID_INFO A
+		  		INNER JOIN cdf.TB_MEMB_INFO B ON A.USER_SEQ_NO = B.USER_SEQ_NO
+		 WHERE B.BUSINESS_NO = #{userId}
+		   AND A.IS_DELETE = 'N'
+		]]>
+	</select>
+
+
+	<!-- 일반 로그인 -->
+	<select id="actionLogin" resultMap="login">
+	/* 일반로그인 */
+			<![CDATA[
+		SELECT A.USER_ID
+		     , A.USER_PW
+		     , B.BUSINESS_NO
+		     , B.MEMB_CLASS
+		     , B.COMPANY_NAME
+		     , B.LAST_DATE
+		  FROM TB_MEMB_ID_INFO A
+		  		LEFT OUTER JOIN TB_MEMB_INFO B ON A.USER_SEQ_NO = B.USER_SEQ_NO
+		 WHERE A.USER_ID = #{userId}
+		 	AND A.USER_PW = #{userPw}
+		   	AND A.IS_DELETE = 'N'
+			]]>
+	</select>
+
+	<!-- 인증서 로그인 -->
+	<select id="actionCrtfctLogin" resultMap="login">
+		<![CDATA[
+		SELECT A.USER_ID
+		     , A.USER_PW
+		     , B.BUSINESS_NO
+		     , B.MEMB_CLASS
+		     , B.COMPANY_NAME
+		     , B.LAST_DATE
+		  FROM TB_MEMB_ID_INFO A
+		  		LEFT OUTER JOIN TB_MEMB_INFO B ON A.USER_SEQ_NO = B.USER_SEQ_NO
+		 WHERE A.USER_ID = #{userId}
+		 	AND A.USER_PW = #{userPw}
+		   	AND A.IS_DELETE = 'N'
+			]]>
+	</select>
+
+	<!-- 아이디 찾기 -->
+	<select id="searchId" resultMap="id">
+			<![CDATA[
+			SELECT A.USER_ID
+			  FROM TB_MEMB_ID_INFO A
+			  	LEFT OUTER JOIN TB_MEMB_INFO B ON A.USER_SEQ_NO = B.USER_SEQ_NO
+			 WHERE B.COMPANY_NAME = #{companyName}
+			   AND B.BUSINESS_NO = #{businessNo}
+			   AND A.IS_DELETE = 'N'
+			]]>
+	</select>
+
+	<!-- 비밀번호 찾기 -->
+	<select id="searchPassword" resultMap="password">
+			<![CDATA[
+			SELECT A.USER_PW
+			  FROM TB_MEMB_ID_INFO A
+			  	LEFT OUTER JOIN TB_MEMB_INFO B ON A.USER_SEQ_NO = B.USER_SEQ_NO
+		 	WHERE A.USER_ID = #{userId}
+			   AND B.COMPANY_NAME = #{companyName}
+			   AND B.BUSINESS_NO = #{businessNo}
+			   AND A.IS_DELETE = 'N'
+			]]>
+	</select>
+
+	<!-- 변경된 비밀번호를 저장 -->
+	<update id="updatePassword">
+			<![CDATA[
+			UPDATE TB_MEMB_ID_INFO
+			   SET USER_PW = #{userPw}
+			 WHERE USER_ID = #{userId}
+			]]>
+	</update>
+
+	<!-- 마지막 로그인 날짜 수정 -->
+	<update id="updateLogin">
+			<![CDATA[
+			UPDATE TB_MEMB_INFO
+			   SET LAST_DATE = TO_CHAR(NOW(), 'YYYYMMDD')
+			 WHERE BUSINESS_NO = #{businessNo}
+			]]>
+	</update>
+
+</mapper>

@@ -1,0 +1,18 @@
+@charset "UTF-8";
+
+/* alert popup */
+.btn-set, .btn-set2 {position:relative; z-index:10;}
+
+/* datepicker */
+.hide-calendar .ui-datepicker-calendar {display: none;}
+
+/* 거래처 찾기 팝업 */
+.popup07 .tbl-type02 {overflow-y: auto; max-height: 361px;}
+
+/* 채권만기일 지정 */
+.buyerAccount th:nth-child(5), .buyerAccount td:nth-child(5) {display: none;}
+
+/* 매출채권 팩토링 알림 팝업 */
+.popup02 .tbl-type02 {overflow-y: auto; max-height: 469px;}
+
+.tbl-btn {margin-top: 20px;}

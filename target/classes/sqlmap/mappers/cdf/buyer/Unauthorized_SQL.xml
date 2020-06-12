@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.buyer.unauthorized.service.impl.UnauthorizedMapper">
+
+	<resultMap id="buyerUnauthorized" type="buyerUnauthorizedVO">
+		<result property="transactionNo" column="transaction_no" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="amount" column="amount" />
+		<result property="collectMoney" column="collect_money" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="salesDate" column="sales_date" />
+		<result property="sellerCompanyName" column="seller_company_name" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+		   AND extra.is_delete = 'N'
+		   AND extra.buyer_biz_no = #{buyerBizNo}
+		   AND extra.sales_date = TO_CHAR(TO_DATE(#{searchDate}, 'yyyy.mm')::date, 'yyyymm')
+		   AND extra.progress_flag = '1'
+		   <if test="sellerBizNo != null and sellerBizNo != ''">
+		   AND extra.seller_biz_no = #{sellerBizNo}
+		   </if>
+		   <if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+		   AND extra.group_type = #{groupType}
+		   </if>
+		</where>
+	</sql>
+
+	<!-- 기타지급 승인 요청 목록 -->
+	<select id="selectBuyerUnauthorizedList" parameterType="map" resultMap="buyerUnauthorized">
+		SELECT extra.transaction_no AS transaction_no
+		     , TO_CHAR(extra.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+		     , TO_CHAR(extra.expiration_date::DATE, 'YYYY.MM.DD') AS expiration_date
+		     , TO_CHAR(extra.payment_date::DATE, 'YYYY.MM.DD') AS payment_date
+		     , extra.amount AS amount
+		     , extra.collect_money AS collect_money
+		     , extra.progress_flag AS progress_flag
+		     , extra.expiration_avg AS expiration_avg
+		     , extra.group_type AS group_type
+		     , extra.is_delete AS is_delete
+		     , extra.taxbill_no AS taxbill_no
+		     , extra.seller_biz_no AS seller_biz_no
+		     , extra.buyer_biz_no AS buyer_biz_no
+		     , extra.sales_date AS sales_date
+		     , memb.company_name AS seller_company_name
+		  FROM tb_extra_collection_info AS extra
+		  JOIN tb_memb_info AS memb ON memb.business_no = extra.seller_biz_no
+		<include refid="condition" />
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<!-- 기타지급 승인 요청 총갯수 -->
+	<select id="selectBuyerUnauthorizedListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(transaction_no)
+		  FROM tb_extra_collection_info AS extra
+		  JOIN tb_memb_info AS memb ON memb.business_no = extra.seller_biz_no
+		<include refid="condition" />
+	</select>
+
+	<!-- 기타지급 승인 수정 -->
+	<update id="updateBuyerUnauthorized" parameterType="buyerUnauthorizedVO">
+		UPDATE tb_extra_collection_info
+		<set>
+			<if test="progressFlag != null and progressFlag != ''">
+			progress_flag = #{progressFlag},
+			</if>
+			<if test="issueDate != null and issueDate != ''">
+			issue_date = #{issueDate},
+			</if>
+			<if test="expirationDate != null and expirationDate != ''">
+			expiration_date = #{expirationDate},
+			</if>
+			<if test="paymentDate != null and paymentDate != ''">
+			payment_date = #{paymentDate},
+			</if>
+			<if test="collectMoney != null and collectMoney != ''">
+			collect_money = #{collectMoney},
+			</if>
+			<if test="expirationAvg != null and expirationAvg != ''">
+			expiration_avg = #{expirationAvg},
+			</if>
+			<if test="groupType != null and groupType != ''">
+			group_type = #{groupType},
+			</if>
+			<if test="isDelete != null and isDelete != ''">
+			is_delete = #{isDelete},
+			</if>
+			<if test="sellerBizNo != null and sellerBizNo != ''">
+			seller_biz_no = #{sellerBizNo},
+			</if>
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			buyer_biz_no = #{buyerBizNo},
+			</if>
+			<if test="salesDate != null and salesDate != ''">
+			sales_date = #{salesDate},
+			</if>
+		</set>
+		<where>
+			<if test="transactionNo!= null and transactionNo != ''">
+			AND transaction_no = #{transactionNo}
+			</if>
+			<if test="taxbillNo != null and taxbillNo != ''">
+			AND taxbill_no = #{taxbillNo}
+			</if>
+			<if test="amount != null and amount != ''">
+			AND amount = #{amount}
+			</if>
+		</where>
+	</update>
+
+</mapper>

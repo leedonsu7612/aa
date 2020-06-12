@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.usr.service.impl.RegistMapper">
+
+	<resultMap id="regist" type="egovframework.com.usr.service.RegistVO">
+		<result property="userSeqNo" column="user_seq_no"/>
+		<result property="userId" column="user_id"/>
+		<result property="userPw" column="user_pw"/>
+		<result property="membNo" column="memb_no"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="membClass" column="memb_class"/>
+		<result property="companyGbn" column="company_gbn"/>
+		<result property="companyName" column="company_name"/>
+		<result property="officesName" column="offices_name"/>
+		<result property="ceoName" column="ceo_name"/>
+		<result property="lastDate" column="last_date"/>
+		<result property="companyAddress" column="company_address"/>
+		<result property="companyPhone" column="company_phone"/>
+		<result property="companyFax" column="company_fax"/>
+		<result property="companyStatus" column="company_status"/>
+		<result property="companyItem" column="company_item"/>
+		<result property="bankName" column="bank_name"/>
+		<result property="bankAccount" column="bank_account"/>
+		<result property="companyStatusCode" column="company_status_code"/>
+		<result property="companyMobile" column="company_mobile"/>
+		<result property="bizMemo" column="biz_memo"/>
+	</resultMap>
+
+	<select id="selectRegist" resultMap="regist">
+
+			SELECT
+				A.user_seq_no, A.user_id, A.user_pw, B.memb_no, B.business_no, B.memb_class, B.company_gbn, B.company_name, B.offices_name,
+				B.ceo_name, B.last_date, B.company_address, B.company_phone, B.company_fax, B.company_status, B.company_item,
+				B.bank_name, B.bank_account, B.company_status_code, B.company_mobile, B.biz_memo
+			FROM tb_memb_id_info A
+				INNER JOIN tb_memb_info B ON A.user_seq_no = B.user_seq_no
+			WHERE 1 = 1
+			<if test="userId != null and userId != ''">
+				AND A.user_id = #{userId}
+			</if>
+			<if test="businessNo != null and businessNo != ''">
+				AND B.business_no = #{businessNo}
+			</if>
+
+	</select>
+
+	<insert id="insertUser" parameterType="RegistVO">
+
+			INSERT INTO tb_memb_id_info
+				( user_seq_no
+				  , user_id
+				  , user_pw
+				  , is_delete )
+			VALUES ( #{userSeqNo}
+				  , #{userId}
+				  , #{userPw}
+				  , 'N' )
+
+	</insert>
+
+	<insert id="insertRegist" parameterType="RegistVO">
+
+			INSERT INTO tb_memb_info
+				( memb_no
+				  , business_no
+				  , memb_class
+				  , company_gbn
+				  , company_name
+				  , offices_name
+				  , ceo_name
+				  , last_date
+				  , company_address
+				  , company_phone
+				  , company_fax
+				  , company_status
+				  , company_item
+				  , bank_name
+				  , bank_account
+				  , company_status_code
+				  , user_seq_no
+				  , terms_yn
+				  , is_delete
+				  , company_mobile
+				  , notify_yn
+				  , biz_memo )
+			VALUES ( #{membNo}
+				  , #{businessNo}
+				  , #{membClass}
+				  , #{companyGbn}
+				  , #{companyName}
+				  , #{officesName}
+				  , #{ceoName}
+				  , TO_CHAR(NOW(), 'YYYYMMDD')
+				  , #{companyAddress}
+				  , #{companyPhone}
+				  , #{companyFax}
+				  , #{companyStatus}
+				  , #{companyItem}
+				  , #{bankName}
+				  , #{bankAccount}
+				  , #{companyStatusCode}
+				  , #{userSeqNo}
+				  , 'Y'
+				  , 'N'
+				  , #{companyMobile}
+				  , 'Y'
+				  , #{bizMemo} )
+
+	</insert>
+
+	<update id="updateUser">
+
+			UPDATE tb_memb_id_info
+			SET user_pw=#{userPw}
+			WHERE user_seq_no=#{userSeqNo}
+
+	</update>
+
+	<update id="updateRegist">
+
+			UPDATE tb_memb_info
+			SET ceo_name=#{ceoName}
+				, company_name=#{companyName}
+				, company_phone=#{companyPhone}
+				, company_fax=#{companyFax}
+				, company_mobile=#{companyMobile}
+				, company_status=#{companyStatus}
+				, company_item=#{companyItem}
+				, company_address=#{companyAddress}
+				, offices_name=#{officesName}
+			WHERE user_seq_no=#{userSeqNo}
+
+	</update>
+
+</mapper>

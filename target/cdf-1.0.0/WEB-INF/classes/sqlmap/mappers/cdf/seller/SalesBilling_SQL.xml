@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.salesBilling.service.impl.SalesBillingMapper">
+
+	<resultMap id="sellerSalesBilling" type="sellerSalesBillingVO">
+		<result property="regDate"  column="reg_date" />
+		<result property="sellerBizNo"  column="seller_biz_no" />
+		<result property="buyerBizNo"  column="buyer_biz_no" />
+		<result property="salesAmount"  column="sales_amount" />
+		<result property="taxAmount"  column="tax_amount" />
+		<result property="receivableAmount"  column="receivable_amount" />
+		<result property="extraAmount"  column="extra_amount" />
+		<result property="collectAmount"  column="collect_amount" />
+		<result property="expirationAvg"  column="expiration_avg" />
+		<result property="isDelete"  column="is_delete" />
+		<result property="overAmount"  column="over_amount" />
+		<result property="endAmount"  column="end_amount" />
+		<result property="setoff"  column="setoff" />
+		<result property="extraAmountOk"  column="extra_amount_ok" />
+		<result property="setoffOk"  column="setoff_ok" />
+	</resultMap>
+
+	<resultMap id="sellerSalesBillingMonth" type="sellerdfrdAcntsRcvbleVO">
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="amount" column="amount" />
+		<result property="transactionNo" column="transaction_no" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="progressFlag" column="progress_flag" />
+	</resultMap>
+
+	<select id="selectSellerSalesBillingList" parameterType="map" resultMap="sellerSalesBilling">
+		SELECT TO_CHAR(sales.reg_date::DATE, 'YYYY.MM') AS reg_date
+		     , sales.buyer_biz_no AS buyer_biz_no
+		     , sales.seller_biz_no AS seller_biz_no
+		     , sales.total_sales_amount${groupCode} AS sales_amount
+		     , sales.total_tax_amount${groupCode} AS tax_amount
+		     , sales.total_receivable_amount${groupCode} AS receivable_amount
+		     , sales.total_extra_amount${groupCode} AS extra_amount
+		     , sales.total_collect_amount${groupCode} AS collect_amount
+		     , sales.expiration_avg${groupCode} AS expiration_avg
+		     , sales.is_delete AS is_delete
+		     , sales.total_over_amount${groupCode} AS over_amount
+		     , sales.end_amount${groupCode} AS end_amount
+		     , sales.total_setoff${groupCode} AS setoff
+		     , sales.total_extra_amount${groupCode}_ok AS extra_amount_ok
+		     , sales.total_setoff${groupCode}_ok AS setoff_ok
+		  FROM tb_sales_monthly_data AS sales
+		 WHERE sales.is_delete = 'N'
+		   AND sales.buyer_biz_no = #{buyerBizNo}
+		   AND sales.seller_biz_no = #{sellerBizNo}
+		   AND TO_CHAR(sales.reg_date::DATE, 'YYYY.MM') BETWEEN #{startDate} AND #{endDate}
+		   AND (sales.total_sales_amount
+		      + sales.total_tax_amount
+		      + sales.total_collect_amount
+		      + sales.total_receivable_amount
+		      + sales.total_extra_amount
+		      + sales.total_setoff
+		      + sales.end_amount
+		      + sales.total_over_amount
+		      + sales.expiration_avg) <![CDATA[ > ]]> 0
+		 ORDER BY TO_CHAR(sales.reg_date::DATE, 'YYYY.MM')
+	</select>
+
+	<select id="selectSellerSalesBillingInTheMonthList" resultMap="sellerSalesBillingMonth">
+		SELECT TO_CHAR(A.issue_date::DATE , 'YYYY.MM.DD') AS issue_date
+			 , TO_CHAR(A.expiration_date::DATE , 'YYYY.MM.DD') AS expiration_date
+			 , (CASE WHEN LENGTH(A.payment_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.payment_date::DATE , 'YYYY.MM.DD') END) AS payment_date
+			 , A.amount
+			 , A.transaction_no
+			 , A.taxbill_no
+			 , A.send_status AS progress_flag
+			 , (CASE WHEN #{groupType} = '0' THEN B.expiration_avg_h WHEN #{groupType} = '1' THEN B.expiration_avg_k ELSE B.expiration_avg END) AS expiration_avg
+		  FROM tb_dfrd_acnts_rcvble A
+		  JOIN tb_sales_monthly_data B ON A.buyer_biz_no = B.buyer_biz_no AND A.seller_biz_no = B.seller_biz_no AND TO_CHAR(B.reg_date::DATE , 'YYYY.MM') = #{salesDate}
+		 WHERE TO_CHAR((A.sales_date || '01')::DATE , 'YYYY.MM') = #{salesDate}
+		   AND A.buyer_biz_no = #{buyerBizNo}
+		   AND A.seller_biz_no = #{sellerBizNo}
+		   AND A.group_type = #{groupType}
+		 ORDER BY A.issue_date
+	</select>
+
+	<select id="selectSellerSalesBillingLimit" parameterType="map" resultMap="com.hyundai.buyer.salesBilling.service.impl.SalesBillingMapper.buyerSalesBillingLimit">
+		SELECT memb.company_name AS company_name
+			 , memb.ceo_name AS ceo_name
+			 , memb.business_no AS business_no
+			 , COALESCE(lim.sales_limit, 0) AS sales_limit
+			 , COALESCE(lim.remaining_limit, 0) AS remaining_limit
+			 , COALESCE(lim.over_limit, 0) AS over_limit
+		  FROM tb_memb_info AS memb
+		  LEFT JOIN tb_buyer_limit_info AS lim ON lim.business_no = memb.business_no
+		 WHERE memb.business_no = #{sellerBizNo}
+		 ORDER BY lim.reg_date DESC
+		 LIMIT 1
+	</select>
+
+</mapper>

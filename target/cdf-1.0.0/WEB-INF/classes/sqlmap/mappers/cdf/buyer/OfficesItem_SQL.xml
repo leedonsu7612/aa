@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.buyer.officesItem.service.impl.OfficesItemMapper">
+
+	<resultMap id="buyerOfficesItem" type="buyerOfficesItemVO">
+		<result property="membNo" column="memb_no"/>
+		<result property="companyName" column="company_name"/>
+		<result property="businessNo" column="business_no"/>
+	</resultMap>
+
+	<select id="selectBuyerOfficesItemList" parameterType="buyerOfficesItemVO" resultMap="buyerOfficesItem">
+		SELECT company_name
+		     , memb_no
+		     , business_no
+		  FROM tb_memb_info
+		 WHERE memb_class = 'S'
+		   AND is_delete = 'N'
+		   <if test="searchKeyword != null and searchKeyword != ''">
+		   AND (
+		   		company_name LIKE '%' || #{searchKeyword} || '%'
+		   		OR memb_no LIKE '%' || #{searchKeyword} || '%'
+		   		OR business_no LIKE '%' || #{searchKeyword} || '%'
+		   )
+		   </if>
+	</select>
+
+</mapper>

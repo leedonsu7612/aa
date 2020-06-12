@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.buyer.salesBilling.service.impl.SalesBillingMapper">
+
+	<resultMap id="buyerSalesBilling" type="buyerSalesBillingVO">
+		<result property="yearMonth" column="year_month" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="salesAmount" column="sales_amount" />
+		<result property="taxAmount" column="tax_amount" />
+		<result property="collectAmount" column="collect_amount" />
+		<result property="expDateCollectAmount" column="exp_date_collect_amount" />
+		<result property="extraAmount" column="extra_amount" />
+		<result property="setoff" column="setoff" />
+		<result property="endAmount" column="end_amount" />
+		<result property="overAmount" column="over_amount" />
+		<result property="expirationAvg" column="expiration_avg" />
+	</resultMap>
+
+	<resultMap id="buyerSalesBillingMonth" type="dfrdAcntsRcvbleVO">
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="amount" column="amount" />
+		<result property="transactionNo" column="transaction_no" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="progressFlag" column="progress_flag" />
+	</resultMap>
+
+	<select id="selectBuyerSalesBillingList" parameterType="map" resultMap="buyerSalesBilling">
+		SELECT TO_CHAR(sales.reg_date::date, 'YYYY.MM') AS year_month
+		     , sales.buyer_biz_no AS buyer_biz_no
+		     , sales.seller_biz_no AS seller_biz_no
+		     , sales.total_sales_amount${groupCode} AS sales_amount
+		     , sales.total_tax_amount${groupCode} AS tax_amount
+		     , sales.total_collect_amount${groupCode} AS collect_amount
+		     , sales.total_collect_amount${groupCode} AS exp_date_collect_amount
+		     , sales.total_extra_amount${groupCode} AS extra_amount
+		     , sales.total_setoff${groupCode} AS setoff
+		     , sales.end_amount${groupCode} AS end_amount
+		     , sales.total_over_amount${groupCode} AS over_amount
+		     , sales.expiration_avg${groupCode} AS expiration_avg
+		  FROM tb_sales_monthly_data AS sales
+		 WHERE sales.is_delete = 'N'
+		   AND sales.buyer_biz_no = #{buyerBizNo}
+		   AND sales.seller_biz_no = #{sellerBizNo}
+		   AND TO_CHAR(sales.reg_date::date, 'YYYY.MM') BETWEEN #{startDate} AND #{endDate}
+		   AND (sales.total_sales_amount
+		      + sales.total_tax_amount
+		      + sales.total_collect_amount
+		      <!-- + sales.exp_date_collect_amount -->
+		      + sales.total_extra_amount
+		      + sales.total_setoff
+		      + sales.end_amount
+		      + sales.total_over_amount
+		      + sales.expiration_avg) <![CDATA[ > ]]> 0
+		 ORDER
+		    BY TO_CHAR(sales.reg_date::date, 'YYYY.MM')
+	</select>
+
+	<select id="selectBuyerSalesBillingInTheMonthList" resultMap="buyerSalesBillingMonth">
+		select  
+			TO_CHAR(A.issue_date::date, 'YYYY.MM.DD') as issue_date
+			, TO_CHAR(A.expiration_date::date, 'YYYY.MM.DD') as expiration_date
+			, (CASE WHEN LENGTH(A.payment_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.payment_date::date, 'YYYY.MM.DD') END) as payment_date
+			, A.amount, A.transaction_no, A.taxbill_no, A.send_status as progress_flag
+			,  (case when #{groupType} = '0' then B.expiration_avg_h
+					when #{groupType} = '1' then B.expiration_avg_k
+					else B.expiration_avg end) as expiration_avg
+		from tb_dfrd_acnts_rcvble A
+			join tb_sales_monthly_data B on A.buyer_biz_no = B.buyer_biz_no and A.seller_biz_no = B.seller_biz_no
+				and TO_CHAR(B.reg_date::date, 'YYYY.MM') = #{salesDate}
+		where 	TO_CHAR((A.sales_date || '01')::date, 'YYYY.MM') = #{salesDate}
+		   AND A.buyer_biz_no = #{buyerBizNo}
+		   AND A.seller_biz_no = #{sellerBizNo}
+		   AND A.group_type = #{groupType}
+		order by A.issue_date
+	</select>
+
+</mapper>

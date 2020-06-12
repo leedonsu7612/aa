@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.buyer.accountReceivable.service.impl.AccountReceivableMapper">
+
+	<resultMap id="buyerAccountReceivable" type="buyerAccountReceivableVO">
+		<result property="transactionNo" column="transaction_no" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="account" column="account" />
+		<result property="collectMoney" column="collect_money" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="insertDate" column="insert_date" />
+		<result property="isExtraAmount" column="is_extra_amount" />
+		<result property="maxRegDate" column="max_reg_date" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="sellerCompanyName" column="seller_company_name" />
+		<result property="salesDate" column="sales_date" />
+	</resultMap>
+
+	<!-- 채권미발행금액 = 매출 - 세금계산서 발행금액 - 초과수금 금액 + 기타수금 요청금액 + 상계수금 요청금액 -->
+	<select id="selectAccountReceivable" parameterType="map" resultMap="buyerAccountReceivable">
+		SELECT TO_CHAR(CURRENT_DATE::DATE, 'YYYY.MM.DD') AS issue_date
+			 , (CASE WHEN total_extra_amount${groupCode} <![CDATA[>]]> 0 THEN '1' ELSE '0' END) AS is_extra_amount
+			 , (total_sales_amount${groupCode} - total_tax_amount${groupCode} - total_over_amount${groupCode} + total_extra_amount${groupCode} + total_setoff${groupCode}) AS account
+			 , (CASE WHEN TO_CHAR(max_reg_date::DATE, 'YYYY.MM') <![CDATA[<]]> #{searchDate} THEN TO_CHAR(max_reg_date::DATE, 'YYYY.MM') ELSE #{searchDate} END) AS max_reg_date
+		  FROM tb_sales_monthly_data AS S1
+		  JOIN (
+				SELECT MAX(reg_date) AS max_reg_date
+					 , buyer_biz_no
+					 , seller_biz_no
+				  FROM tb_sales_monthly_data
+				 GROUP BY buyer_biz_no
+					 , seller_biz_no
+			   ) AS S2
+		    ON S2.buyer_biz_no = S1.buyer_biz_no
+		   AND S2.seller_biz_no = S1.seller_biz_no
+		 WHERE S1.is_delete = 'N'
+		   AND S1.buyer_biz_no = #{buyerBizNo}
+		   AND S1.seller_biz_no = #{sellerBizNo}
+		   AND CASE WHEN TO_CHAR(max_reg_date::DATE, 'YYYY.MM') <![CDATA[<]]> #{searchDate} THEN reg_date = max_reg_date ELSE TO_CHAR(reg_date::DATE , 'YYYY.MM') = #{searchDate} END
+	</select>
+
+	<!-- 매출채권 팩토링 알림 목록 -->
+	<select id="selectAccountReceivableList" parameterType="map" resultMap="buyerAccountReceivable">
+		SELECT *
+		  FROM (
+			SELECT sales.buyer_biz_no AS buyer_biz_no
+				 , sales.seller_biz_no AS seller_biz_no
+				 , memb.company_name AS seller_company_name
+				 , TO_CHAR(sales.reg_date::DATE, 'YYYY.MM') AS sales_date
+				 , (CASE WHEN total_extra_amount > 0 THEN '1' ELSE '0' END) AS is_extra_amount
+				 , (total_sales_amount - total_tax_amount - total_over_amount + total_extra_amount + total_setoff) AS account
+			  FROM tb_sales_monthly_data AS sales
+			  JOIN tb_memb_info AS memb ON memb.business_no = sales.seller_biz_no
+			 WHERE sales.is_delete = 'N'
+			   AND buyer_biz_no = #{buyerBizNo}
+		  ) AS res
+		 WHERE res.account <![CDATA[>]]> 0
+		 ORDER BY res.sales_date DESC
+	</select>
+
+	<!-- 매출채권 등록 -->
+	<insert id="insertAccountReceivable" parameterType="list">
+		INSERT INTO tb_accounts_receivable_info (
+			   transaction_no
+			 , issue_date
+			 , expiration_date
+			 , payment_date
+			 , account
+			 , collect_money
+			 , progress_flag
+			 , expiration_avg
+			 , group_type
+			 , is_delete
+			 , insert_date
+			 , buyer_biz_no
+			 , seller_biz_no
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			 #{item.transactionNo}
+			, TO_CHAR(TO_DATE(#{item.issueDate}, 'yyyy.mm.dd')::DATE, 'YYYYMMDD')
+			, TO_CHAR(TO_DATE(#{item.expirationDate}, 'yyyy.mm.dd')::DATE, 'YYYYMMDD')
+			, null
+			, #{item.account}
+			, 0
+			, 4
+			, #{item.expirationAvg}
+			, #{item.groupType}
+			, 'N'
+			, TO_CHAR(NOW(), 'YYYYMMDD')
+			, #{item.buyerBizNo}
+			, #{item.sellerBizNo}
+		)
+		</foreach>
+	</insert>
+
+	<!-- 매출채권 변경이력 등록 -->
+	<insert id="insertReceivableChange" parameterType="buyerReceivableChangeVO">
+		INSERT
+		  INTO tb_receivable_change_info (
+			   reg_datetime
+			 , millisec
+			 , transaction_no
+			 , before_expi_date
+			 , progress_flag
+			 , expiration_avg
+			 , is_delete
+			 , insert_date
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			   TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDDHH24MISS')
+			 , TO_CHAR(CURRENT_TIMESTAMP, 'US')
+			 , #{item.transactionNo}
+			 , TO_CHAR(TO_DATE(#{item.beforeExpiDate}, 'yyyy.mm.dd')::DATE, 'YYYYMMDD')
+			 , 4
+			 , #{item.expirationAvg}
+			 , 'N'
+			 , TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDDHH24MISS')
+		)
+		</foreach>
+	</insert>
+
+	<!-- <update id="updateReceivableChange" parameterType="buyerReceivableChangeVO">
+		UPDATE tb_receivable_change_info
+		<set>
+			   reg_datetime
+			 , millisec
+			 , transaction_no
+			 , before_expi_date
+			 <if test="afterExpiDate != null and afterExpiDate != ''">
+			 , after_expi_date
+			 </if>
+			 , progress_flag
+			 , expiration_avg
+			 , is_delete
+		</set>
+	</update> -->
+
+</mapper>

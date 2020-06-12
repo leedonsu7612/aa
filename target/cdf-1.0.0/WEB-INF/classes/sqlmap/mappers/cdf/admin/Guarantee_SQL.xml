@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.admin.guarantee.service.impl.GuaranteeMapper">
+
+	<resultMap id="guarantee" type="guaranteeVO">
+		<result property="regDate" column="reg_date"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="totalSalesAmount" column="total_sales_amount"/>
+		<result property="totalTaxAmount" column="total_tax_amount"/>
+		<result property="totalReceivableAmount" column="total_receivable_amount"/>
+		<result property="totalCollectAmount" column="total_collect_amount"/>
+		<result property="totalExtraAmountOk" column="total_extra_amount_ok"/>
+		<result property="totalExtraAmount" column="total_extra_amount"/>
+		<result property="totalSetoffOk" column="total_setoff_ok"/>
+		<result property="totalSetoff" column="total_setoff"/>
+		<result property="totalOverAmount" column="total_over_amount"/>
+		<result property="unpayAmount" column="unpay_amount"/>
+		<result property="unissuedAmount" column="unissued_amount"/>
+	</resultMap>
+
+	<select id="selectGuaranteeList" parameterType="guaranteeVO" resultMap="guarantee">
+
+			select A.reg_date, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, A.total_sales_amount, A.total_tax_amount, A.total_receivable_amount, A.total_collect_amount, A.total_extra_amount_ok, A.total_extra_amount
+				, A.total_setoff_ok, A.total_setoff, A.total_over_amount, (A.total_receivable_amount - A.total_collect_amount) as unpay_amount
+				, (A.total_sales_amount - A.total_tax_amount - A.total_over_amount + A.total_extra_amount + A.total_setoff) as unissued_amount
+			from tb_sales_monthly_data A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where A.is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.reg_date ASC, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectGuaranteeListTotCnt" parameterType="guaranteeVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_sales_monthly_data
+			where is_delete = 'N'		
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="dfrdAcntsRcvble" type="dfrdAcntsRcvbleVO">
+		<result property="transactionNo" column="transaction_no"/>
+		<result property="taxbillNo" column="taxbill_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="issueDate" column="issue_date"/>
+		<result property="salesDate" column="sales_date"/>
+		<result property="amount" column="amount"/>
+		<result property="expirationDate" column="expiration_date"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="progressFlag" column="send_status"/>
+	</resultMap>
+
+	<select id="selectDfrdAcntsRcvbleList" parameterType="dfrdAcntsRcvbleVO" resultMap="dfrdAcntsRcvble">
+
+			select A.transaction_no, A.taxbill_no, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, TO_CHAR(A.issue_date::date, 'YYYY-MM-DD') as issue_date, TO_CHAR((A.sales_date || '01')::date, 'YYYY-MM') as sales_date, A.amount
+				, TO_CHAR(A.expiration_date::date, 'YYYY-MM-DD') as expiration_date
+				, (CASE WHEN LENGTH(A.payment_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.payment_date::date, 'YYYY-MM-DD') END) as payment_date
+				, A.send_status
+			from tb_dfrd_acnts_rcvble A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where 1 = 1
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.sales_date, A.issue_date, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectDfrdAcntsRcvbleListTotCnt" parameterType="dfrdAcntsRcvbleVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_dfrd_acnts_rcvble
+			where 1 = 1	
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="extraCollection" type="extraCollectionVO">
+		<result property="transactionNo" column="transaction_no"/>
+		<result property="taxbillNo" column="taxbill_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="issueDate" column="issue_date"/>
+		<result property="salesDate" column="sales_date"/>
+		<result property="amount" column="amount"/>
+		<result property="expirationDate" column="expiration_date"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="progressFlag" column="progress_flag"/>
+	</resultMap>
+
+	<select id="selectExtraCollectionList" parameterType="extraCollectionVO" resultMap="extraCollection">
+
+			select A.transaction_no, A.taxbill_no, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, TO_CHAR(A.issue_date::date, 'YYYY-MM-DD') as issue_date, TO_CHAR((A.sales_date || '01')::date, 'YYYY-MM') as sales_date, A.amount
+				, TO_CHAR(A.expiration_date::date, 'YYYY-MM-DD') as expiration_date
+				, (CASE WHEN LENGTH(A.payment_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.payment_date::date, 'YYYY-MM-DD') END) as payment_date
+				, A.progress_flag
+			from tb_extra_collection_info A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where A.is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.sales_date, A.issue_date, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectExtraCollectionListTotCnt" parameterType="extraCollectionVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_extra_collection_info
+			where is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="setOffInfo" type="setOffInfoVO">
+		<result property="transactionNo" column="transaction_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="issueDate" column="issue_date"/>
+		<result property="salesDate" column="sales_date"/>
+		<result property="amount" column="amount"/>
+		<result property="expirationDate" column="expiration_date"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="progressFlag" column="progress_flag"/>
+	</resultMap>
+
+	<select id="selectSetOffInfoList" parameterType="setOffInfoVO" resultMap="setOffInfo">
+
+			select A.transaction_no, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, TO_CHAR(A.issue_date::date, 'YYYY-MM-DD') as issue_date, TO_CHAR((A.sales_date || '01')::date, 'YYYY-MM') as sales_date, A.amount
+				, TO_CHAR(A.expiration_date::date, 'YYYY-MM-DD') as expiration_date
+				, (CASE WHEN LENGTH(A.payment_date) <![CDATA[ < ]]> 8 THEN '-' ELSE TO_CHAR(A.payment_date::date, 'YYYY-MM-DD') END) as payment_date
+				, A.progress_flag
+			from tb_setoff_info A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where A.is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.sales_date, A.issue_date, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectSetOffInfoListTotCnt" parameterType="setOffInfoVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_setoff_info
+			where is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="taxbill" type="taxbillVO">
+		<result property="taxbillNo" column="taxbill_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="salesDate" column="sales_date"/>
+		<result property="amount" column="amount"/>
+		<result property="groupType" column="group_type"/>
+	</resultMap>
+
+	<select id="selectTaxbillList" parameterType="taxbillVO" resultMap="taxbill">
+
+			select A.taxbill_no, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, TO_CHAR((A.sales_date || '01')::date, 'YYYY-MM') as sales_date, A.amount
+				, (CASE WHEN A.group_type = '0' THEN '현대' WHEN A.group_type = '1' THEN '기아' END) as group_type
+			from tb_taxbill_info A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where A.is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.sales_date, A.issue_date, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectTaxbillListTotCnt" parameterType="taxbillVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_taxbill_info
+			where is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="salesSlip" type="salesSlipVO">
+		<result property="salesDate" column="sales_date"/>
+		<result property="heimsSalesSlipNo" column="heims_sales_slip_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="supplyValue" column="supply_value"/>
+		<result property="useTaxbillYn" column="use_taxbill_yn"/>
+		<result property="taxbillNo" column="taxbill_no"/>
+		<result property="groupType" column="group_type"/>
+		<result property="overInput" column="over_input"/>
+		<result property="overOutput" column="over_output"/>
+	</resultMap>
+
+	<select id="selectSalesSlipList" parameterType="salesSlipVO" resultMap="salesSlip">
+
+			select TO_CHAR(A.sales_date::date, 'YYYY-MM-DD') as sales_date, A.heims_sales_slip_no
+				, A.seller_biz_no, B.company_name as seller_co_nm, A.buyer_biz_no, C.company_name as buyer_co_nm
+				, A.supply_value, (CASE WHEN A.use_taxbill_yn = 'Y' THEN '발행' WHEN A.use_taxbill_yn = 'N' THEN '미발행' END) as use_taxbill_yn, A.taxbill_no
+				, (CASE WHEN A.group_type = '0' THEN '현대' WHEN A.group_type = '1' THEN '기아' END) as group_type
+				, A.over_input, A.over_output
+			from tb_sales_slip_info A
+				join tb_memb_info B on A.seller_biz_no = B.business_no and B.is_delete = 'N'
+				join tb_memb_info C on A.buyer_biz_no = C.business_no and C.is_delete = 'N'
+			where A.is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	A.buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	A.seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+			ORDER BY A.sales_date ASC, A.buyer_biz_no, A.seller_biz_no
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectSalesSlipListTotCnt" parameterType="salesSlipVO" resultType="int">
+
+			select COUNT(buyer_biz_no) as totcnt
+			from tb_sales_slip_info
+			where is_delete = 'N'
+			<if test="membClass != null and membClass != ''">
+		        <choose>
+		            <when test="membClass == 'B'.toString()">
+						AND	buyer_biz_no = #{buyerBizNo}
+					</when>
+		            <when test="membClass == 'S'.toString()">
+						AND	seller_biz_no = #{sellerBizNo}
+					</when>
+				</choose>
+			</if>
+	</select>
+
+	<resultMap id="unissued" type="unissuedVO">
+		<result property="taxbillNo" column="taxbill_no"/>
+		<result property="salesAmount" column="sales_amount"/>
+		<result property="receivableAmount" column="receivable_amount"/>
+		<result property="extraAmount" column="extra_amount"/>
+		<result property="setoffAmount" column="setoff_amount"/>
+		<result property="unissuedAmount" column="unissued_amount"/>
+	</resultMap>
+
+	<select id="selectUnissuedList" parameterType="unissuedVO" resultMap="unissued">
+	
+			select A.taxbill_no, C.supply_value as sales_amount, B.account as receivable_amount, D.amount as extra_amount, E.amount as setoff_amount
+				,(C.supply_value - B.account - D.amount - E.amount - C.over_input) as unissued_amount
+			from tb_taxbill_mapping A
+				join tb_accounts_receivable_info B on A.transaction_no = B.transaction_no and B.is_delete = 'N'
+				join tb_sales_slip_info C on A.taxbill_no = C.taxbill_no and C.is_delete = 'N'
+				left outer join tb_extra_collection_info D on ('C' || A.transaction_no) = D.transaction_no and D.is_delete = 'N'
+				left outer join tb_setoff_info E on ('S' || A.transaction_no) = E.transaction_no and D.is_delete = 'N'
+			where A.sales_date like #{salesDate} || '%' and A.seller_biz_no = #{sellerBizNo} and A.buyer_biz_no = #{buyerBizNo} and A.is_delete = 'N'
+			
+	</select>
+
+</mapper>

@@ -1,0 +1,45 @@
+#### Common ####
+timeout: 5 # in Seconds
+
+#### User ####
+user:
+  mspId: HciMSP
+  privKey: userwallet/private.key
+  pubCert: userwallet/public.pem
+
+#### Channel ####
+channel:
+  name: cdfchannel
+
+#### Members ####
+members:
+  - name: org1
+    domain: hci.com
+    tlsCAFile: "userwallet/tlsca.pem-org1"
+    mspId: HciMSP
+    peers:
+      - name: peer0
+        ip: "192.168.1.100"
+        tlsEnabled: true
+        port: 7051
+  - name: org2
+    domain: mobis.com
+    tlsCAFile: "userwallet/tlsca.pem-org2"
+    mspId: MobisMSP
+    peers:
+      - name: peer0
+        ip: "192.168.1.100"
+        tlsEnabled: true
+        port: 8051
+
+#### Orderer ####
+ordererorg:
+  - name: orderer
+    domain: orderer.com
+    tlsCAFile: "userwallet/tlsca.pem-orderer"
+    mspId: OrdererMSP
+    orderers:
+      - name: orderer
+        ip: "192.168.1.100"
+        tlsEnabled: true
+        port: 7050

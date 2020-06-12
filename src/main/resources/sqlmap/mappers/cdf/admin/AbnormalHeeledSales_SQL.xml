@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.admin.abnormalHeeledSales.service.impl.AbnormalHeeledSalesMapper">
+
+	<resultMap id="abnormalHeeledSales" type="com.hyundai.admin.abnormalHeeledSales.service.AbnormalHeeledSalesVO">
+		<result property="regDate" column="reg_date"/>
+		<result property="buyerCoNm" column="buyer_co_nm"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="buyerMembNo" column="buyer_memb_no"/>
+		<result property="sellerCoNm" column="seller_co_nm"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="sellerMembNo" column="seller_memb_no"/>
+		<result property="salesLimit" column="sales_limit"/>
+		<result property="remainingLimit" column="remaining_limit"/>
+		<result property="overLimit" column="over_limit"/>
+		<result property="tradeAmt" column="trade_amt"/>
+		<result property="abnormalAmt" column="abnormal_amt"/>
+	</resultMap>
+
+	<select id="selectAbnormalHeeledSalesList" parameterType="AbnormalHeeledSalesVO" resultMap="abnormalHeeledSales">
+
+			select substring(A.sales_date, 1, 6) as reg_date
+				, C.company_name as buyer_co_nm, C.business_no as buyer_biz_no, C.memb_no as buyer_memb_no
+				, D.company_name as seller_co_nm, D.business_no as seller_biz_no, D.memb_no as seller_memb_no
+				, B.sales_limit, B.remaining_limit, B.over_limit
+				, A.supply_value as trade_amt, A.minus_val as abnormal_amt
+			from tb_sales_slip_info A
+				join tb_buyer_limit_info B on A.buyer_biz_no = B.business_no and B.is_delete = 'N' 
+					and substring(B.reg_date, 1, 6) = substring(A.sales_date, 1, 6)
+				join tb_memb_info C on A.buyer_biz_no = C.business_no
+				join tb_memb_info D on A.seller_biz_no = D.business_no
+			where A.is_delete = 'N' and ABS(A.minus_val) <![CDATA[ > ]]> 0
+		   <if test="searchKeyword != null and searchKeyword != ''">
+		   AND (
+		   		C.company_name LIKE '%' || #{searchKeyword} || '%'
+		   		OR D.company_name LIKE '%' || #{searchKeyword} || '%'
+		   		OR C.business_no = #{searchKeyword}
+		   		OR D.business_no = #{searchKeyword}
+		   )
+		   </if>
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectAbnormalHeeledSalesListTotCnt" parameterType="AbnormalHeeledSalesVO" resultType="int">
+
+			select COUNT(A.buyer_biz_no) as totcnt
+			from tb_sales_slip_info A
+				join tb_buyer_limit_info B on A.buyer_biz_no = B.business_no and B.is_delete = 'N' 
+					and substring(B.reg_date, 1, 6) = substring(A.sales_date, 1, 6)
+				join tb_memb_info C on A.buyer_biz_no = C.business_no
+				join tb_memb_info D on A.seller_biz_no = D.business_no
+			where A.is_delete = 'N' and ABS(A.minus_val) <![CDATA[ > ]]> 0
+		   <if test="searchKeyword != null and searchKeyword != ''">
+		   AND (
+		   		C.company_name LIKE '%' || #{searchKeyword} || '%'
+		   		OR D.company_name LIKE '%' || #{searchKeyword} || '%'
+		   		OR C.business_no = #{searchKeyword}
+		   		OR D.business_no = #{searchKeyword}
+		   )
+		   </if>
+			
+	</select>
+
+</mapper>

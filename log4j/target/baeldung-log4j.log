@@ -1,0 +1,14 @@
+2020-04-29 19:55:32 INFO  Load configuration file: config/config.yaml
+2020-04-29 19:55:32 INFO  Load configuration from C:\work\cdf\config\config.yaml.
+
+2020-04-29 19:55:32 ERROR Failed to load configuration file: config/config.yaml
+java.io.FileNotFoundException: C:\work\cdf\config\config.yaml (지정된 경로를 찾을 수 없습니다)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at com.hyundaicommercial.cdf.blockchain.util.Helper.<init>(Helper.java:73)
+	at com.hyundaicommercial.cdf.blockchain.Interface.<init>(Interface.java:18)
+	at com.hyundaicommercial.cdf.blockchain.App.main(App.java:28)
+2020-04-29 19:55:32 INFO  Input: {"REMAINING_LIMIT":10000,"OFF_DATE":"9","BYR_LIMIT_NO":"1","OVER_LIMIT":10000,"SET_AMOUNT":0,"AMOUNT":10000,"GUAR_AMOUNT":10000,"SET_DATE":"8","LIMIT_CONTRACT_NO":"12"}
+

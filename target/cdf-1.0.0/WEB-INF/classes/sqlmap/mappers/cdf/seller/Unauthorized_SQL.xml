@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.unauthorized.service.impl.UnauthorizedMapper">
+
+	<resultMap id="sellerUnauthorized" type="sellerUnauthorizedVO">
+		<result property="salesDate" column="sales_date" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="amountRequestable" column="amount_requestable" />
+		<result property="amountRequested" column="amount_requested" />
+		<result property="buyerCompanyName" column="buyer_company_name" />
+	</resultMap>
+
+	<sql id="from">
+		  FROM (
+				SELECT reg_date
+				     , end_amount_h - (total_sales_amount_h - total_tax_amount_h - total_setoff_h_ok) - total_extra_amount_h AS amount_requestable
+				     , total_extra_amount_h AS amount_requested
+				     , '0' AS group_type
+				     , buyer_biz_no AS buyer_biz_no
+				     , seller_biz_no AS seller_biz_no
+				  FROM tb_sales_monthly_data
+				 WHERE is_delete = 'N'
+				   AND end_amount_h <![CDATA[>]]> 0
+				 UNION ALL
+				SELECT reg_date
+				     , end_amount_k - (total_sales_amount_k - total_tax_amount_k - total_setoff_k_ok) - total_extra_amount_k AS amount_requestable
+				     , total_extra_amount_k AS amount_requested
+				     , '1' AS group_type
+				     , buyer_biz_no AS buyer_biz_no
+				     , seller_biz_no AS seller_biz_no
+				  FROM tb_sales_monthly_data
+				 WHERE is_delete = 'N'
+				   AND end_amount_K <![CDATA[>]]> 0
+			 ) sales
+		  JOIN tb_memb_info AS memb ON memb.business_no = sales.buyer_biz_no
+	</sql>
+
+	<sql id="condition">
+		<where>
+		   AND amount_requestable <![CDATA[>]]> 0
+		   <if test="sellerBizNo != null and sellerBizNo != ''">
+		   AND sales.seller_biz_no = #{sellerBizNo}
+		   </if>
+		   <if test="buyerBizNo != null and buyerBizNo != ''">
+		   AND sales.buyer_biz_no = #{buyerBizNo}
+		   </if>
+		   <if test="searchDate != null and searchDate != ''">
+		   AND TO_CHAR(sales.reg_date::DATE, 'YYYY.MM') = #{searchDate}
+		   </if>
+		   <if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+		   AND group_type = #{groupType}
+		   </if>
+		</where>
+	</sql>
+
+	<select id="selectSellerUnauthorizedList" parameterType="map" resultMap="sellerUnauthorized">
+		SELECT TO_CHAR(sales.reg_date::DATE, 'YYYY.MM') AS sales_date
+		     , TO_CHAR(CURRENT_DATE, 'YYYY.MM.dd') AS issue_date
+		     , TO_CHAR(DATE_TRUNC('month', (sales.reg_date::TIMESTAMP + '1 month')), 'YYYY.MM.dd') AS expiration_date
+		     , amount_requestable
+		     , amount_requested
+		     , group_type
+		     , seller_biz_no
+		     , buyer_biz_no
+		     , company_name AS buyer_company_name
+		<include refid="from" />
+		<include refid="condition" />
+		 ORDER BY amount_requested DESC
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<select id="selectSellerUnauthorizedListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(sales.reg_date)
+		<include refid="from" />
+		<include refid="condition" />
+	</select>
+
+	<insert id="insertSellerUnauthorized" parameterType="sellerUnauthorizedVO">
+		INSERT INTO tb_setoff_info (
+			   transaction_no
+			 , issue_date
+			 , expiration_date
+			 , payment_date
+			 , amount
+			 , collect_money
+			 , progress_flag
+			 , expiration_avg
+			 , group_type
+			 , is_delete
+			 , insert_date
+			 , taxbill_no
+			 , seller_biz_no
+			 , buyer_biz_no
+			 , sales_date)
+		VALUES (
+			   #{transactionNo}
+			 , #{issueDate}
+			 , #{expirationDate}
+			 , #{paymentDate}
+			 , #{amount}
+			 , #{collectMoney}
+			 , #{progressFlag}
+			 , #{expirationAvg}
+			 , #{groupType}
+			 , 'N'
+			 , TO_CHAR(CURRENT_DATE, 'YYYYMMDD')
+			 , #{taxbillNo}
+			 , #{sellerBizNo}
+			 , #{buyerBizNo}
+			 , #{salesDate}
+		)
+	</insert>
+
+	<update id="updateSellerUnauthorized" parameterType="sellerUnauthorizedVO">
+		UPDATE tb_sales_monthly_data
+		   SET total_extra_amount = total_extra_amount + #{amount}
+		   <if test="groupType == '0'.toString()">
+			 , total_extra_amount_h = total_extra_amount_h + #{amount}
+		   </if>
+		   <if test="groupType == '1'.toString()">
+			 , total_extra_amount_k = total_extra_amount_k + #{amount}
+		   </if>
+		 WHERE TO_CHAR(reg_date::DATE, 'YYYYMM') = #{salesDate}
+		   AND seller_biz_no = #{sellerBizNo}
+		   AND buyer_biz_no = #{buyerBizNo}
+	</update>
+
+</mapper>

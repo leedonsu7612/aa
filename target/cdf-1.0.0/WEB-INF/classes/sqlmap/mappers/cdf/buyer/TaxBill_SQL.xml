@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.buyer.taxBill.service.impl.TaxBillMapper">
+
+	<resultMap id="buyerTaxBill" type="buyerTaxBillVO">
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="sellerCode" column="seller_memb_code" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerCode" column="buyer_memb_code" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="salesDate" column="sales_date" />
+		<result property="issueDate" column="issue_date" />
+		<result property="amount" column="amount" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="peri001SumMoney" column="peri001_sum_money" />
+		<result property="peri002SumMoney" column="peri002_sum_money" />
+		<result property="peri003SumMoney" column="peri003_sum_money" />
+		<result property="peri001BalMoney" column="peri001_bal_money" />
+		<result property="peri002BalMoney" column="peri002_bal_money" />
+		<result property="peri003BalMoney" column="peri003_bal_money" />
+		<result property="groupType" column="group_type" />
+		<result property="publishType" column="publish_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="insertDate" column="insert_date" />
+		<result property="sellerCompanyName" column="seller_company_name" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+			<!-- 대리점 사업자번호 -->
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			AND tax.buyer_biz_no = #{buyerBizNo}
+			</if>
+			<!-- 검색기간 -->
+			<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			AND tax.sales_date BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'yyyy.mm.dd')::DATE, 'yyyymmdd') AND TO_CHAR(TO_DATE(#{endDate}, 'yyyy.mm.dd')::DATE, 'yyyymmdd')
+			</if>
+			<!-- 구분코드 -->
+			<if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+			AND tax.group_type = #{groupType}
+			</if>
+			<!-- 품목점 사업자번호 -->
+			<if test="sellerBizNo != null and sellerBizNo != ''">
+			AND tax.seller_biz_no = #{sellerBizNo}
+			</if>
+			<!-- 매출월 -->
+			<if test="salesDate != null and salesDate != ''">
+			AND tax.sales_date = #{searchDate}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 세금계산서 목록 -->
+	<select id="selectBuyerTaxBillList" parameterType="map" resultMap="buyerTaxBill">
+		SELECT memb.company_name AS seller_company_name
+		     , tax.group_type AS group_type
+		     , tax.seller_biz_no AS sellerBizNo
+		     , tax.seller_code AS sellerMembCode
+		     , tax.taxbill_no AS taxbill_no
+			 , TO_CHAR(tax.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+		     , tax.amount AS amount
+		     , tax.publish_type AS publish_type
+		  FROM tb_taxbill_info AS tax
+		  LEFT OUTER JOIN tb_memb_info AS memb ON tax.seller_biz_no = memb.business_no
+		 <include refid="condition" />
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<!-- 세금계산서 총 갯수 -->
+	<select id="selectBuyerTaxBillListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(1)
+		  FROM tb_taxbill_info AS tax
+		  LEFT OUTER JOIN tb_memb_info AS memb ON tax.seller_biz_no = memb.business_no
+		 <include refid="condition" />
+	</select>
+
+	<!-- 세금계산서 -->
+	<select id="selectBuyerTaxBill" parameterType="map" resultMap="buyerTaxBill">
+		SELECT *
+		  FROM tb_taxbill_info AS tax
+		 <include refid="condition" />
+	</select>
+
+</mapper>

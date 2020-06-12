@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.buyer.myOfficesItem.service.impl.MyOfficesItemMapper">
+
+	<resultMap id="buyerMyOfficesItem" type="buyerMyOfficesItemVO">
+		<result property="businessNo" column="business_no" />
+		<result property="membClass" column="memb_class" />
+		<result property="itemCode" column="item_code" />
+		<result property="isDelete" column="is_delete" />
+		<result property="companyName" column="company_name" />
+		<result property="membNo" column="memb_no" />
+	</resultMap>
+
+	<!-- My 거래처 목록 -->
+	<select id="selectBuyerMyOfficesItemList" parameterType="buyerMyOfficesItemVO" resultMap="buyerMyOfficesItem">
+		SELECT my.business_no AS business_no
+		     , my.memb_class AS memb_class
+		     , my.item_code AS item_code
+		     , my.is_delete AS is_delete
+		     , memb.company_name AS company_name
+		     , memb.memb_no AS memb_no
+		  FROM tb_my_shop_info my
+		  JOIN tb_memb_info memb ON my.item_code = memb.business_no
+		 WHERE memb.memb_class = 'S'
+		   AND my.memb_class = 'B'
+		   AND my.is_delete = 'N'
+		   AND my.business_no = #{businessNo}
+		   <if test="itemCodeList != null and !itemCodeList.isEmpty()">
+		   AND my.item_code IN <foreach collection="itemCodeList" item="itemCode" open="(" separator=", " close=")">#{itemCode}</foreach>
+		   </if>
+		 ORDER
+		    BY my.reg_date DESC
+	</select>
+	<!-- // My 거래처 목록 -->
+
+	<!-- My 거래처 추가 -->
+	<insert id="insertBuyerMyOfficesItem" parameterType="buyerMyOfficesItemVO">
+		INSERT INTO tb_my_shop_info (
+			business_no
+		  , memb_class
+		  , item_code
+		  , reg_date
+		  , is_delete
+		)
+		VALUES
+		<foreach collection="itemCodeList" item="itemCode" separator=", ">
+		(
+			#{businessNo}
+		  , 'B'
+		  , #{itemCode}
+		  , TO_CHAR(NOW(), 'YYYYMMDD')
+		  , 'N'
+		)
+		</foreach>
+	</insert>
+	<!-- // My 거래처 추가 -->
+
+	<!-- My 거래처 삭제 -->
+	<delete id="deleteBuyerMyOfficesItem" parameterType="buyerMyOfficesItemVO">
+		DELETE FROM tb_my_shop_info
+		 WHERE business_no = #{businessNo}
+		   AND item_code IN <foreach collection="itemCodeList" item="itemCode" open="(" separator=", " close=")">#{itemCode}</foreach>
+	</delete>
+	<!-- // My 거래처 삭제 -->
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.taxBill.service.impl.SellerTaxBillMapper">
+
+	<resultMap id="sellerTaxBill" type="sellerTaxBillVO">
+		<id property="salesSlipNo" column="sales_slip_no" />
+		<result property="heimsSalesSlipNo" column="heims_sales_slip_no" />
+		<result property="sellerCode" column="seller_code" />
+		<result property="buyerCode" column="buyer_code" />
+		<result property="salesDate" column="sales_date" />
+		<result property="supplyValue" column="supply_value" />
+		<result property="taxAmount" column="tax_amount" />
+		<result property="useTaxbillYn" column="use_taxbill_yn" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="groupType" column="group_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="heimsStatus" column="heims_status" />
+		<result property="overInput" column="over_input" />
+		<result property="overOutput" column="over_output" />
+		<result property="minusVal" column="minus_val" />
+		<result property="overBase" column="over_base" />
+		<result property="buyerCompanyName" column="buyer_company_name" />
+		<result property="minSalesDate" column="min_sales_date" />
+		<result property="maxSalesDate" column="max_sales_date" />
+		<result property="salesSlipSum" column="sales_slip_sum" />
+		<result property="salesSlipCnt" column="sales_slip_cnt" />
+	</resultMap>
+
+	<resultMap id="sellerTaxBillStatus" type="sellerTaxBillStatusVO">
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="sellerCode" column="seller_code" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="buyerCode" column="buyer_code" />
+		<result property="buyerBizNo" column="buyer_biz_no" />
+		<result property="salesDate" column="sales_date" />
+		<result property="issueDate" column="issue_date" />
+		<result property="amount" column="amount" />
+		<result property="progressFlag" column="progress_flag" />
+		<result property="peri001SumMoney" column="peri001_sum_money" />
+		<result property="peri002SumMoney" column="peri002_sum_money" />
+		<result property="peri003SumMoney" column="peri003_sum_money" />
+		<result property="peri001BalMoney" column="peri001_bal_money" />
+		<result property="peri002BalMoney" column="peri002_bal_money" />
+		<result property="peri003BalMoney" column="peri003_bal_money" />
+		<result property="groupType" column="group_type" />
+		<result property="publishType" column="publish_type" />
+		<result property="isDelete" column="is_delete" />
+		<result property="insertDate" column="insert_date" />
+		<result property="buyerCompanyName" column="buyer_company_name" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+			AND tax.is_delete = 'N'
+			<!-- 대리점 사업자번호 -->
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			AND tax.buyer_biz_no = #{buyerBizNo}
+			</if>
+			<!-- 검색기간 -->
+			<if test="startDate != null and startDate != ''">
+			AND tax.sales_date <![CDATA[>=]]> TO_CHAR(TO_DATE(#{startDate}, 'yyyy.mm')::DATE, 'yyyymm')
+			</if>
+			<if test="endDate != null and endDate != ''">
+			AND tax.sales_date <![CDATA[<=]]> TO_CHAR(TO_DATE(#{endDate}, 'yyyy.mm')::DATE, 'yyyymm')
+			</if>
+			<!-- 구분코드 -->
+			<if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+			AND tax.group_type = #{groupType}
+			</if>
+			<!-- 품목점 사업자번호 -->
+			<if test="sellerBizNo != null and sellerBizNo != ''">
+			AND tax.seller_biz_no = #{sellerBizNo}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 세금계산서 목록 -->
+	<select id="selectSellerTaxBillList" parameterType="map" resultMap="sellerTaxBill">
+		SELECT buyer.company_name AS buyer_company_name
+			 , tax.buyer_code AS buyer_code
+			 , tax.buyer_biz_no AS buyer_biz_no
+			 , tax.group_type AS group_type
+			 , TO_CHAR(MIN(tax.sales_date)::DATE, 'yyyy.mm.dd') AS min_sales_date
+			 , TO_CHAR(MAX(tax.sales_date)::DATE, 'yyyy.mm.dd') AS max_sales_date
+			 , SUM(tax.supply_value) AS supply_value
+			 , SUM(tax.tax_amount) AS tax_amount
+			 , SUM(tax.supply_value + tax.tax_amount) AS sales_slip_sum
+			 , COUNT(tax.sales_date) AS sales_slip_cnt
+		FROM cdf.tb_sales_slip_info AS tax
+		LEFT JOIN cdf.tb_memb_info AS buyer ON buyer.business_no = tax.buyer_biz_no
+		 <include refid="condition" />
+		   AND tax.use_taxbill_yn = 'N'
+		 GROUP BY tax.seller_biz_no
+			 , buyer.company_name
+			 , tax.buyer_code
+			 , tax.buyer_biz_no
+			 , tax.group_type
+	</select>
+
+	<!-- 세금계산서 진행 목록 -->
+	<select id="selectSellerTaxBillStatusList" parameterType="map" resultMap="sellerTaxBillStatus">
+		SELECT memb.company_name AS buyer_company_name
+			 , tax.group_type AS group_type
+			 , tax.buyer_biz_no AS buyer_biz_no
+			 , tax.buyer_code AS buyer_code
+			 , tax.taxbill_no AS taxbill_no
+			 , TO_CHAR(tax.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+			 , tax.amount AS amount
+			 , tax.progress_flag AS progressFlag
+		  FROM tb_taxbill_info AS tax
+		  LEFT OUTER JOIN tb_memb_info AS memb ON tax.buyer_biz_no = memb.business_no
+		 <include refid="condition" />
+		 ORDER BY tax.taxbill_no
+	</select>
+
+	<!-- 세금계산서 진행 총 갯수 -->
+	<select id="selectSellerTaxBillStatusListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(1)
+		  FROM tb_taxbill_info AS tax
+		  LEFT OUTER JOIN tb_memb_info AS memb ON tax.buyer_biz_no = memb.business_no
+		 <include refid="condition" />
+	</select>
+
+	<!-- 세금계산서 진행 총 합 -->
+	<select id="selectSellerTaxBillStatusListSum" parameterType="map" resultType="long">
+		SELECT SUM(tax.amount)
+		  FROM tb_taxbill_info AS tax
+		  LEFT OUTER JOIN tb_memb_info AS memb ON tax.buyer_biz_no = memb.business_no
+		 <include refid="condition" />
+	</select>
+</mapper>

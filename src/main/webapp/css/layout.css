@@ -1,0 +1,180 @@
+@charset "utf-8";
+
+/* pew ???怨ㅼ? */
+/* location */
+.location_wrap {width:980px; margin:54px auto 0; position:relative;}
+.location_wrap h2 {height:40px; padding-left:20px;}
+
+.location { height:15px; position:absolute; right:36px; top:8px; overflow:hidden; }
+.location li { float:left; background:url(../images/ico/bul_arrow_02.gif) no-repeat 0 1px; padding-left:12px; margin-right:6px; line-height:14px;}
+.location li.home { background:none; padding:0;}
+.location li.home img { vertical-align:top;}
+.location li a { font-size:11px; color:#4c4c4c;}
+.location li.last { margin:0;}
+
+/* btn */
+
+.btn_print { position:absolute; right:0; top:2px; }
+.btn_print2 { position:absolute; right:0; top:-40px;}
+.btn_tbl_top1 { position:absolute; right:0; top:-12px;}
+
+/* sitemap */
+#sitemap {width:100%; height:256px; background:url(../images/common/bg_sitemap.gif) repeat-x 0 0;}
+.sitemap {width:980px; margin:0 auto;}
+.sitemap ul { padding-top:28px;}
+.sitemap ul:after { clear: both; content: ""; display: block;}
+.sitemap ul li {float:left;}
+.sitemap ul li p.tit {height:33px; font-size:12px; font-weight:bold; color:#555;}
+.sitemap ul li p.tit a { color:#555;}
+.sitemap ul li.site1 {width:176px;}
+.sitemap ul li.site2 {width:169px;}
+.sitemap ul li.site3 {width:129px;}
+.sitemap ul li.site4 {width:112px;}
+.sitemap ul li.site5 {width:163px;}
+.sitemap ul li.site6 {width:117px;}
+.sitemap ul li.site7 {width:113px;}
+.sitemap ul li ul {padding-top:0px;}
+.sitemap ul li ul li {height:13px; padding-bottom:10px; font-size:12px; color:#585858; float:none;}
+.sitemap ul li ul li a {color:#585858;}
+
+/* regist service_menu */
+.header .regist_service_menu { float:right; padding-top:3px;}
+.header .regist_service_menu:after { display:block; clear:both; content:"";}
+.header .regist_service_menu li { float:left; padding-right:29px; margin-right:28px; background:url(../images/ico/bar_gray_02.gif) no-repeat right top;}
+.header .regist_service_menu li.last { background:none; margin-right:0px;}
+.header .regist_service_menu li.on a{ display:block; padding-bottom:13px; border-bottom:5px solid #471e71;}    /* 0121 ????????? : img ????⑥??? bar ????? ?????????????? ??????占?*/
+
+/* pew ???怨ㅼ? */
+
+/* layout */
+body.main {background:none;}
+body.main #contents { margin:0 auto;}
+#wrap { width:100%; position:relative;}
+
+#header { width:100%; background:url(../images/common/bg_header.gif) repeat-x 0 30px #f1f1f2;}
+#header:after { display:block; clear:both; content:"";}
+.header {position:relative; width:980px; padding-top:41px; margin:0 auto; } /* 140106 : ????????? */
+.header:after { clear:both; display:block; content:"";}
+.header h1 { float:left; width:205px; height:69px;}
+
+/* Skip navigation */
+.skip_navi {width:100%;}
+.skip_navi li {width:980px;margin:0 auto;}
+.skip_navi li a {width:155px;border:2px solid #000;text-align:center;font-weight:bold;line-height:2.17;}
+.skip_navi li a:focus {}
+
+/* global menu */
+.header .global_menu { float:left; height:15px; padding-top:8px;}
+.header .global_menu:after { display:block; clear:both; content:"";}
+.header .global_menu li { float:left; padding-right:13px; margin-right:14px; font-size:15px; line-height:15px; color:#44227a; background:url(../images/ico/bar_gray_01.gif) no-repeat right top;}
+.header .global_menu li a { color:#44227a;}
+.header .global_menu li.on a { font-weight:bold;}
+.header .global_menu li.last { background:none; padding-right:0px; margin-right:0px;}
+
+/* buyer service_menu */
+.header .service_menu { float:right; width:375px; margin-top:-35px;}
+.header .service_menu:after { display:block; clear:both; content:"";}
+.header .service_menu li { float:left; margin-right:5px; background:url(../images/ico/bar_gray_02.gif) no-repeat right top;}
+.header .service_menu li.last { background:none; margin-right:0px;}
+.header .service_menu li.on a { display:block; padding-bottom:13px; border-bottom:5px solid #471e71;}   /* 0121 ????????? : img ????⑥??? bar ????? ?????????????? ??????占?*/
+.header .service_menu li.s_btn {  width:180px;background:url(../images/btn/btn_faq.gif) repeat-x 0 0; color: #fff; font-size: 12px; font-weight: normal; line-height: 25px; border:1px solid #ccc; text-align:center;}
+.header .service_menu li.s_btn a { width:176px;display: inline-block; text-decoration:none; text-align:center;padding:0px 2px 0px 2px;}
+
+.header .service_menu li.s_btn a:link,
+.header .service_menu li.s_btn a:active,
+.header .service_menu li.s_btn a:visited,
+.header .service_menu li.s_btn a:focus,
+.header .service_menu li.s_btn a:hover { color: #333; }
+.header .service_menu li.s_btn a.menu_selected,
+.header .service_menu li.s_btn a:hover { color:#fff;background:url(../images/btn/btn_normal.gif) repeat-x 0 0; text-decoration:underline;}
+
+/* seller service_munu */
+.header .seller_service_menu { float:right; width:400px; margin-top:-40px;}
+.header .seller_service_menu:after { display:block; clear:both; content:"";}
+.header .seller_service_menu li { float:left; margin-right:5px; background:url(../images/ico/bar_gray_02.gif) no-repeat right top;}
+.header .seller_service_menu li.last { background:none; margin-right:0px;}
+.header .seller_service_menu li.on a { display:block; padding-bottom:13px; border-bottom:5px solid #471e71;}   /* 0121 ????????? : img ????⑥??? bar ????? ?????????????? ??????占?*/
+.header .seller_service_menu li.s_btn {  width:188px;background:url(../images/btn/btn_faq.gif) repeat-x 0 0; color: #fff; font-size: 12px; font-weight: normal; line-height: 20px; border:1px solid #ccc; text-align:center;}
+.header .seller_service_menu li.s_btn a { width:182px;display: inline-block; text-decoration:none; text-align:center;padding:0px 2px 0px 2px;}
+
+.header .seller_service_menu li.s_btn a:link,
+.header .seller_service_menu li.s_btn a:active,
+.header .seller_service_menu li.s_btn a:visited,
+.header .seller_service_menu li.s_btn a:focus,
+.header .seller_service_menu li.s_btn a:hover { color: #333;}
+.header .seller_service_menu li.s_btn a.menu_selected,
+.header .seller_service_menu li.s_btn a:hover { color:#fff;background:url(../images/btn/btn_normal.gif) repeat-x 0 0; text-decoration:underline;}
+
+/* ??????????????? ?????껌 ???????깆??? ????듭?*/
+.etc_popup {display:none;background-color:#f7f7f7; width:500px; height:100px; position:absolute; top:200px; left:270px; border:1px solid #ccc; padding:20px 20px; z-index:1;}
+.etc_popup dt {margin-top:25px; font-size:16px;text-align:center; font-weight:bold; margin-bottom:30px;}
+.etc_popup dt span { font-size:20px;}
+.etc_popup dt span a{ color:#ff4e4e;}
+.etc_popup dd { width:400px; text-align:center;}
+.etc_popup span.btn:first-child { margin-right:10px;}
+
+/* ????몄? ???????깆????????? */
+.loading_popup {display:none;background-color:#f7f7f7; width:400px; height:130px; border:1px solid #ccc; padding:20px 20px; z-index:1;}
+.loading_popup dt {margin-top:25px; font-size:16px;text-align:center; font-weight:bold; margin-bottom:30px;}
+.loading_popup dt span { font-size:20px;}
+.loading_popup dt span a{ color:#ff4e4e;}
+.loading_popup dd { width:400px; text-align:center;}
+.loading_popup span.btn:first-child { margin-right:10px;}
+
+/* ???????몄???껌 ????????? ???????κ낀???占썲????????듭?????듭? */
+.alert_popup {display:none;background-color:#f7f7f7; width:400px; height:130px; position:absolute; top:200px; left:270px; border:1px solid #ccc; padding:20px 20px; z-index:1;}
+.alert_popup dt {margin-top:25px; font-size:16px;text-align:center; font-weight:bold; margin-bottom:30px;}
+.alert_popup dt span { font-size:20px;}
+.alert_popup dt span a{ color:#ff4e4e;}
+.alert_popup dd { width:400px; text-align:center;}
+.alert_popup span.btn:first-child { margin-right:10px;}
+
+/* ????? ????????? ??????????????????????? ??????占썲????????듭?????듭? ????? ?????? ???????깆????????? */
+.alert_popup_1 {display:none;background-color:#f7f7f7; width:400px; height:130px; position:absolute; top:200px; left:270px; border:1px solid #ccc; padding:20px 20px; z-index:1;}
+.alert_popup_1 dt {margin-top:15px; font-size:16px;text-align:center; font-weight:bold; margin-bottom:20px;}
+.alert_popup_1 dt span { line-height:30px; font-size:20px;}
+.alert_popup_1 dt span a { color:#ff4e4e;}
+.alert_popup_1 dd { width:400px; text-align:center; margin-top:-10px;}
+.alert_popup_1 span.btn:first-child { margin-right:10px;}
+.alert_popup_1 .btn_btxt{display:block;margin-top:20px;}
+
+/* ???留ㅻ?????????Ⅹ?쇱???옙?????????????? ???????깆????????? */
+.alert_popup_2 {display:none;background-color:#f7f7f7; width:400px; height:130px; position:absolute; top:400px; left:270px; border:1px solid #ccc; padding:20px 20px; z-index:1;}
+.alert_popup_2 dt {margin-top:10px; font-size:16px;text-align:center; font-weight:bold; margin-bottom:20px;}
+.alert_popup_2 dt span { line-height:30px; font-size:20px;}
+.alert_popup_2 dt span a { color:#ff4e4e;}
+.alert_popup_2 dd { width:400px; text-align:center; margin-top:20px;}
+.alert_popup_2 span.btn:first-child { margin-right:10px;}
+.alert_popup_2 .btn_btxt{display:block;margin-top:20px;}
+
+/* container */
+#container { width:100%;}
+#container:after { display:block; clear:both; content:"";}
+
+/* contents */
+#contents { width:980px; margin:0 auto 100px; position:relative; z-index:2;}
+#contents:after { display:block; clear:both; content:"";}
+#contents h3 { height:35px; background:url(../images/ico/bul_arrow_03.gif) no-repeat 0 3px; padding-left:15px; font-size:16px; font-weight:bold; color:#7e1a7c;}
+#contents h3.h3Txt {height:25px; background:none; padding-left:0;}
+#contents h4 { font-size:15px; font-weight:bold; color:#7e1a7c;}
+ 
+/* footer */
+#ft { padding: 20px 0px 50px; border-top: 1px solid #dddddd; }
+#ft .footer { width: 1500px; margin: 0 auto; }
+#ft .footer > ul { overflow: hidden; }
+#ft .footer > ul > li { text-align: center; font-style: normal;  font-size: 13px; color: #666666; line-height: 22px; }
+#ft .footer > ul > li:first-child { margin-bottom: 10px;}
+#ft .footer > ul > li:first-child > a { margin-left: 13px;}
+#ft .footer > ul > li.ft_logo { margin-top: 20px;}
+#ft .footer address { font-style: normal;}
+#ft .footer p { font-size: 13px; color: #fff; line-height: 25px; }
+
+
+/* Paging */
+.paging { margin-top: 50px; text-align: center; }
+.paging a,.paging span { display: inline-block; width: 35px; height: 35px; line-height: 35px; vertical-align: middle; margin-left: -1px; border: 1px solid #dddddd; }
+.paging span { border:none; color: #fff; background: #000; }
+.paging a.first { text-indent: -9999px; background: url(../images/ico/ico-first.png) no-repeat center center; }
+.paging a.prev { margin-right: 10px; text-indent: -9999px; background: url(../images/ico/ico-prev.png) no-repeat center center; }
+.paging a.next { margin-left: 10px;text-indent: -9999px; background: url(../images/ico/ico-next.png) no-repeat center center; }
+.paging a.last { text-indent: -9999px; background: url(../images/ico/ico-last.png) no-repeat center center; }

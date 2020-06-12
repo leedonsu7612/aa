@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.admin.authorization.service.impl.AuthorizationMapper">
+
+	<resultMap id="memberAuthList" type="memberAuthVO">
+		<result property="userId" column="user_id"/>
+		<result property="userSeqNo" column="user_seq_no"/>
+		<result property="companyName" column="company_name"/>
+		<result property="isDelete" column="is_delete"/>
+		
+	</resultMap>
+
+	<resultMap id="memberAuth" type="memberAuthVO">
+		<result property="userId" column="user_id"/>
+		<result property="userPw" column="user_pw"/>
+		<result property="userSeqNo" column="user_seq_no"/>
+		<result property="companyName" column="company_name"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="attchFileId" column="attch_file_id"/>
+		<result property="membClass" column="memb_class"/>
+	</resultMap>
+
+	<resultMap id="groupAuth" type="menuAuthVO">
+		<result property="menuId" column="menu_id"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="menuNm" column="menu_nm"/>
+		<result property="authClass" column="auth_class"/>
+		<result property="useAt" column="use_at"/>
+	</resultMap>
+
+	<select id="selectMemberAuthList" parameterType="memberAuthVO" resultMap="memberAuthList">
+
+			select B.user_id, B.user_seq_no, A.company_name, A.is_delete, A.last_date
+			from tb_memb_info A
+				join tb_memb_id_info B on A.user_seq_no = B.user_seq_no	and B.is_delete = 'N'
+			where 1=1
+			<if test="membClass != null and membClass != ''">
+				and A.memb_class = #{membClass}
+				<if test="membClass == 'M'.toString()">
+					or A.memb_class = 'N'
+				</if>
+				<if test="membClass == 'H'.toString()">
+					or A.memb_class = 'I'
+				</if>
+			</if>
+			order by A.last_date
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectMemberAuthListTotCnt" parameterType="memberAuthVO" resultType="int">
+
+			select count(B.user_id)
+			from tb_memb_info A
+				join tb_memb_id_info B on A.user_seq_no = B.user_seq_no	and B.is_delete = 'N'
+			where 1=1
+			<if test="membClass != null and membClass != ''">
+				and A.memb_class = #{membClass}
+				<if test="membClass == 'M'.toString()">
+					or A.memb_class = 'N'
+				</if>
+				<if test="membClass == 'H'.toString()">
+					or A.memb_class = 'I'
+				</if>
+			</if>
+			
+	</select>
+
+	<select id="selectMemberAuthEdit" parameterType="memberAuthVO" resultMap="memberAuth">
+
+			select B.user_id, B.user_pw, B.user_seq_no, A.company_name, A.is_delete,  A.memb_class
+			from tb_memb_info A
+				join tb_memb_id_info B on A.user_seq_no = B.user_seq_no	
+			where B.user_id = #{userId}			
+	</select>
+
+	<update id="updateMemberAuth" parameterType="memberAuthVO">
+
+			UPDATE tb_memb_info
+			SET memb_class=#{membClass}
+				, is_delete=#{isDelete}
+			WHERE user_seq_no=#{userSeqNo}
+
+	</update>
+
+	<delete id="deleteMemberIdInfo">
+
+			<!-- DELETE FROM tb_memb_id_info
+			WHERE user_seq_no=#{userSeqNo} -->
+			UPDATE tb_memb_id_info SET is_delete='Y'
+			WHERE user_seq_no=#{userSeqNo}
+	</delete>
+
+	<delete id="deleteMemberInfo">
+
+			DELETE FROM tb_memb_info
+			WHERE user_seq_no=#{userSeqNo}
+
+	</delete>
+
+	<select id="selectGroupAuthList" parameterType="String" resultMap="groupAuth">
+
+			select menu_id, parent_id, menu_nm, auth_class
+				,(case when auth_class like '%:' || #{membClass} || ':%' then 'Y' else 'N' end) as use_at
+			from cdf.tb_menu_use_policy
+			where is_delete = 'N'
+			order by menu_id
+	</select>
+
+	<update id="updateGroupAuth" parameterType="menuAuthVO">
+
+			UPDATE tb_menu_use_policy
+			SET auth_class=#{authClass}
+			WHERE menu_id=#{menuId}
+
+	</update>
+
+</mapper>

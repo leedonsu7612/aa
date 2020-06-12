@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.buyer.payment.service.impl.PaymentdMapper">
+
+	<resultMap id="buyerPayment" type="buyerPaymentVO">
+		<result property="sellerCompanyName" column="seller_company_name" />
+		<result property="sellerBizNo" column="seller_biz_no" />
+		<result property="sellerMembNo" column="seller_memb_no" />
+		<result property="groupType" column="group_type" />
+		<result property="issueDate" column="issue_date" />
+		<result property="expirationDate" column="expiration_date" />
+		<result property="paymentDate" column="payment_date" />
+		<result property="amount" column="amount" />
+		<result property="transactionNo" column="transaction_no" />
+		<result property="taxbillNo" column="taxbill_no" />
+		<result property="expirationAvg" column="expiration_avg" />
+		<result property="sendStatus" column="send_status" />
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+		   AND dfrd.buyer_biz_no = #{buyerBizNo}
+		   <if test="sellerBizNo != null and sellerBizNo != ''">
+		   AND dfrd.seller_biz_no = #{sellerBizNo}
+		   </if>
+		   <if test="searchType != null and searchType != '' and searchType == '0'.toString()">
+		   AND TO_CHAR((dfrd.issue_date)::DATE, 'YYYY.MM.DD') BETWEEN #{startDate} AND #{endDate}
+		   </if>
+		   <if test="searchType != null and searchType != '' and searchType == '1'.toString()">
+		   AND TO_CHAR((dfrd.expiration_date)::DATE, 'YYYY.MM.DD') BETWEEN #{startDate} AND #{endDate}
+		   </if>
+		   <if test="sendStatus != null and sendStatus != '' and sendStatus != '100'">
+		   AND dfrd.send_status = #{sendStatus}
+		   </if>
+		   <if test="groupType != null and groupType != '' and groupType != '2'.toString()">
+		   AND dfrd.group_type = #{groupType}
+		   </if>
+		</where>
+	</sql>
+
+	<select id="selectBuyerPaymentList" parameterType="map" resultMap="buyerPayment">
+		SELECT seller.company_name AS seller_company_name
+			 , seller.business_no AS seller_biz_no
+			 , seller.memb_no AS seller_memb_no
+			 , dfrd.group_type AS group_type
+			 , TO_CHAR(dfrd.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+			 , TO_CHAR(dfrd.expiration_date::DATE, 'YYYY.MM.DD') AS expiration_date
+			 , (CASE WHEN LENGTH(dfrd.payment_date) <![CDATA[<]]> 8 THEN '-' ELSE TO_CHAR(dfrd.payment_date::DATE, 'YYYY.MM.DD') END) AS payment_date
+			 , dfrd.amount AS amount
+			 , dfrd.transaction_no AS transaction_no
+			 , dfrd.taxbill_no AS taxbill_no
+			 , dfrd.send_status AS send_status
+			 , sales.expiration_avg AS expiration_avg
+		  FROM tb_dfrd_acnts_rcvble AS dfrd
+		  JOIN tb_sales_monthly_data AS sales ON dfrd.buyer_biz_no = sales.buyer_biz_no AND dfrd.seller_biz_no = sales.seller_biz_no
+		  JOIN tb_memb_info AS seller ON sales.seller_biz_no = seller.business_no
+		  <include refid="condition" />
+		 ORDER
+		    BY dfrd.issue_date
+		 LIMIT #{recordCountPerPage} OFFSET #{firstRecordIndex}
+	</select>
+
+	<select id="selectBuyerPaymentListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(1)
+		  FROM tb_dfrd_acnts_rcvble AS dfrd
+		  JOIN tb_sales_monthly_data AS sales ON dfrd.buyer_biz_no = sales.buyer_biz_no AND dfrd.seller_biz_no = sales.seller_biz_no
+		  JOIN tb_memb_info AS seller ON sales.seller_biz_no = seller.business_no
+		  <include refid="condition" />
+	</select>
+
+	<select id="selectBuyerPaymentSummary" parameterType="map" resultType="int">
+		SELECT COALESCE(SUM(COALESCE(dfrd.amount, 0)), 0)
+		  FROM tb_dfrd_acnts_rcvble AS dfrd
+		  JOIN tb_sales_monthly_data AS sales ON dfrd.buyer_biz_no = sales.buyer_biz_no AND dfrd.seller_biz_no = sales.seller_biz_no
+		  JOIN tb_memb_info AS seller ON sales.seller_biz_no = seller.business_no
+		  <include refid="condition" />
+	</select>
+
+</mapper>

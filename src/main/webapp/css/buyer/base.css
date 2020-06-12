@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* 초기화 */
+
+@import url(./fonts.css);
+
+html { }
+body { margin:0; padding:0; font-size:0.75em; color: #555; font-family:'Malgun gothic', Helvetica, sans-serif;  font-weight: 400; }
+html, h1, h2, h3, h4, h5, h6, form, fieldset, img {margin:0;padding:0;border:0}
+h1, h2, h3, h4, h5, h6 {font-size:1em; font-family:'Malgun gothic', Helvetica, sans-serif; }
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block}
+
+#hd ul, nav ul, #ft ul, ul {margin:0;padding:0;list-style:none}
+li {list-style:none}
+legend {position:absolute;margin:0;padding:0;font-size:0;line-height:0;text-indent:-9999em;overflow:hidden}
+label, input, button, select, img {vertical-align: middle;}
+input, button {margin:0;padding:0; font-family:'Malgun gothic', Helvetica, sans-serif; font-size:13px; color:#555; }
+button {cursor:pointer}
+textarea, input[type="text"], input[type="password"] { font-size:14px; color: #555; padding: 0px 10px; border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
+input[type="radio"] { width:19px; height:19px; border:1px solid #ddd; background: #fff;}
+input { color: #333333; border:1px solid #ddd; }
+textarea, select {font-family:'Malgun gothic', Helvetica, sans-serif; border:1px solid #ddd; color: #555;}
+select {border:1px solid #ddd; background:#fff; height:26px; }
+p {margin:0;padding:0;word-break:normal; }
+hr {display:none}
+pre {overflow-x:scroll;font-size:1.1em}
+a:link, a:visited {color:#555;text-decoration:none}
+a:hover, a:focus, a:active {color:#930029;text-decoration:none; }
+
+em { font-style:normal;}
+
+/* 테이블 */
+table {border-collapse:collapse; width:100%;}
+caption {height:0;overflow:hidden;font-size:0;line-height:0;text-indent:-20000px;}
+
+#wrap { width: 100%;  }
+
+input:-ms-input-placeholder { color: #777777; }
+input::-webkit-input-placeholder { color: #777777; } 
+input::-moz-placeholder { color: #777777; }

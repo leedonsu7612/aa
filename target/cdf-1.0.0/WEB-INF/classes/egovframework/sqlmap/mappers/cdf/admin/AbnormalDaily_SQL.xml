@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.admin.abnormalDaily.service.impl.AbnormalDailyMapper">
+
+	<resultMap id="abnormalDaily" type="egovframework.com.admin.abnormalDaily.service.AbnormalDailyVO">
+		<result property="regDate" column="reg_date"/>
+		<result property="companyName" column="company_name"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="membNo" column="memb_no"/>
+		<result property="salesLimit" column="sales_limit"/>
+		<result property="remainingLimit" column="remaining_limit"/>
+		<result property="overLimit" column="over_limit"/>
+		<result property="tradeAmt" column="trade_amt"/>
+		<result property="abnormalAmt" column="abnormal_amt"/>
+	</resultMap>
+
+	<select id="selectAbnormalDailyList" parameterType="AbnormalDailyVO" resultMap="abnormalDaily">
+
+			select substring(#{regDate}, 1, 6) as reg_date
+				, C.company_name, C.business_no, C.memb_no
+				, B.sales_limit, B.remaining_limit, B.over_limit
+				, A.trade_amt, A.abnormal_amt
+			from (
+					select buyer_biz_no , sum(supply_value) as trade_amt, sum(minus_val) as abnormal_amt
+					from tb_sales_slip_info
+					where is_delete = 'N' and sales_date = #{regDate}
+						and ABS(minus_val) <![CDATA[ > ]]> 0
+					group by buyer_biz_no
+				) A
+				join tb_buyer_limit_info B on A.buyer_biz_no = B.business_no and B.is_delete = 'N' 
+					and substring(B.reg_date, 1, 6) = substring(#{regDate}, 1, 6)
+				join tb_memb_info C on A.buyer_biz_no = C.business_no
+			where 1=1
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+			
+	</select>
+
+	<select id="selectAbnormalDailyListTotCnt" parameterType="AbnormalDailyVO" resultType="int">
+
+			select COUNT(A.buyer_biz_no) as totcnt
+			from (
+					select buyer_biz_no , sum(supply_value) as trade_amt, sum(minus_val) as abnormal_amt
+					from tb_sales_slip_info
+					where is_delete = 'N' and sales_date = #{regDate}
+						and ABS(minus_val) <![CDATA[ > ]]> 0
+					group by buyer_biz_no
+				) A
+				join tb_buyer_limit_info B on A.buyer_biz_no = B.business_no and B.is_delete = 'N' 
+					and substring(B.reg_date, 1, 6) = substring(#{regDate}, 1, 6)
+				join tb_memb_info C on A.buyer_biz_no = C.business_no
+			where 1=1
+			
+	</select>
+
+</mapper>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.com.admin.member.service.impl.MemberMapper">
+
+	<resultMap id="member" type="egovframework.com.admin.member.service.MemberVO">
+		<result property="membNo" column="memb_no"/>
+		<result property="membClass" column="memb_class"/>
+		<result property="companyName" column="company_name"/>
+		<result property="businessNo" column="business_no"/>
+		<result property="ceoName" column="ceo_name"/>
+		<result property="dishonoredType" column="dishonored_type"/>
+	</resultMap>
+
+	<insert id="insertMember" parameterType="MemberVO">
+
+			INSERT INTO tb_memb_info
+				( memb_no
+				  , memb_class
+				  , company_name
+				  , business_no
+				  , ceo_name )
+			VALUES ( #{membNo}
+				  , #{membClass}
+				  , #{companyName}
+				  , #{businessNo}
+				  , #{ceoName} )
+
+	</insert>
+
+	<update id="updateMember">
+
+			UPDATE tb_memb_info
+			SET memb_no=#{membNo}
+				, memb_class=#{membClass}
+				, company_name=#{companyName}
+				, business_no=#{businessNo}
+				  WHERE memb_no=#{membNo}
+
+	</update>
+
+	<delete id="deleteMember">
+
+			DELETE FROM tb_memb_info
+			WHERE memb_no=#{membNo}
+
+	</delete>
+
+	<select id="selectMember" resultMap="member">
+
+			SELECT
+				memb_no, memb_class, company_name, business_no, ceo_name
+			FROM tb_memb_info
+			<where>
+				<if test="membNo != null and membNo != ''">
+				AND memb_no=#{membNo}
+				</if>
+				<if test="businessNo != null and businessNo != ''">
+				AND business_no = #{businessNo}
+				</if>
+			</where>
+
+	</select>
+
+	<select id="selectMemberList" parameterType="MemberVO" resultMap="member">
+
+			SELECT
+				A.memb_class, A.memb_no, A.company_name, A.ceo_name, A.business_no, B.occur_type as dishonored_type
+			FROM tb_memb_info A
+				left outer join tb_dishonored_info B on A.business_no = B.business_no and B.is_delete = 'N'
+			WHERE 1=1
+			<if test="membClass != null and membClass != '' and (membClass != 'A'.toString())">
+				AND A.memb_class = #{membClass}
+			</if>
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND	A.business_no LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	A.company_name LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 2">
+						AND	A.ceo_name LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+			ORDER BY last_date ASC
+			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectMemberListTotCnt" parameterType="MemberVO" resultType="int">
+
+			SELECT COUNT(*) totcnt
+			FROM tb_memb_info
+			WHERE 1=1
+			<if test="membClass != null and membClass != '' and (membClass != 'A'.toString())">
+				AND memb_class = #{membClass}
+			</if>
+			<if test="searchKeyword != null and searchKeyword != ''">
+		        <choose>
+		            <when test="searchCondition == 0">
+						AND	business_no LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 1">
+						AND	company_name LIKE '%' || #{searchKeyword} || '%'
+					</when>
+		            <when test="searchCondition == 2">
+						AND	ceo_name LIKE '%' || #{searchKeyword} || '%'
+					</when>
+				</choose>
+			</if>
+	</select>
+
+</mapper>

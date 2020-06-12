@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyundai.seller.accountReceivable.service.impl.ChangeOrApproveMapper">
+
+	<resultMap id="sellerChangeOrApprove" type="sellerChangeOrApproveVO">
+		<result property="transactionNo" column="transaction_no"/>
+		<result property="issueDate" column="issue_date"/>
+		<result property="paymentDate" column="payment_date"/>
+		<result property="beforeExpiDate" column="before_expi_date"/>
+		<result property="account" column="account"/>
+		<result property="collectMoney" column="collect_money"/>
+		<result property="progressFlag" column="progress_flag"/>
+		<result property="expirationAvg" column="expiration_avg"/>
+		<result property="groupType" column="group_type"/>
+		<result property="isDelete" column="is_delete"/>
+		<result property="insertDate" column="insert_date"/>
+		<result property="buyerBizNo" column="buyer_biz_no"/>
+		<result property="sellerBizNo" column="seller_biz_no"/>
+		<result property="buyerCompanyName" column="buyer_company_name"/>
+		<result property="afterExpiDate" column="after_expi_date"/>
+	</resultMap>
+
+	<sql id="condition">
+		<where>
+			AND acnt.is_delete = 'N'
+			<if test="buyerBizNo != null and buyerBizNo != ''">
+			   AND acnt.buyer_biz_no = #{buyerBizNo}
+			</if>
+			<if test="sellerBizNo != null and sellerBizNo != ''">
+			   AND acnt.seller_biz_no = #{sellerBizNo}
+			</if>
+			<if test="startDate != null and startDate != ''">
+			   AND TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM') <![CDATA[>=]]> #{startDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+			   AND TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM') <![CDATA[<=]]> #{endDate}
+			</if>
+			<if test="(progressFlag != null and progressFlag != '') and progressFlag != 0">
+			   AND acnt.progress_flag = #{progressFlag}
+			</if>
+		</where>
+	</sql>
+
+	<select id="selectSellerChangeOrApproveList" parameterType="map" resultMap="sellerChangeOrApprove">
+		SELECT acnt.transaction_no AS transaction_no
+			 , TO_CHAR(acnt.issue_date::DATE, 'YYYY.MM.DD') AS issue_date
+			 , TO_CHAR(acnt.expiration_date::DATE, 'YYYY.MM.DD') AS before_expi_date
+			 , TO_CHAR(acnt.payment_date::DATE, 'YYYY.MM.DD') AS payment_date
+			 , acnt.account AS account
+			 , acnt.collect_money AS collect_money
+			 , acnt.progress_flag AS progress_flag
+			 , acnt.expiration_avg AS expiration_avg
+			 , acnt.group_type AS group_type
+			 , acnt.is_delete AS is_delete
+			 , acnt.insert_date AS insert_date
+			 , acnt.buyer_biz_no AS buyer_biz_no
+			 , acnt.seller_biz_no AS seller_biz_no
+			 , memb.company_name AS buyer_company_name
+			 , rcvb.after_expi_date AS after_expi_date
+		  FROM tb_accounts_receivable_info AS acnt
+		  LEFT JOIN tb_memb_info AS memb ON memb.business_no = acnt.buyer_biz_no
+		  LEFT JOIN tb_receivable_change_info AS rcvb ON rcvb.transaction_no = acnt.transaction_no AND rcvb.is_delete = 'N'
+		 <include refid="condition" />
+	</select>
+
+	<select id="selectSellerChangeOrApproveListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(acnt.transaction_no)
+		  FROM tb_accounts_receivable_info AS acnt
+		  LEFT JOIN tb_memb_info AS memb ON memb.business_no = acnt.buyer_biz_no
+		 <include refid="condition" />
+	</select>
+
+	<!-- 매출채권 정보 업데이트 -->
+	<update id="updateSellerAccountReceivable" parameterType="sellerChangeOrApproveVO">
+		UPDATE tb_accounts_receivable_info
+		   SET progress_flag = #{progressFlag}
+		 WHERE transaction_no = #{transactionNo}
+	</update>
+
+	<!-- 매출채권 정보이력 업데이트 -->
+	<update id="updateSellerReceivableChange" parameterType="sellerChangeOrApproveVO">
+		UPDATE tb_receivable_change_info
+		   SET before_expi_date = #{beforeExpiDate}
+		     , after_expi_date = #{afterExpiDate}
+		     , progress_flag = #{progressFlag}
+		 WHERE transaction_no = #{transactionNo}
+	</update>
+
+</mapper>

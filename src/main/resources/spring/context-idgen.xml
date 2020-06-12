@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean name="egovIdGnrService" class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="strategy" 	ref="mixPrefixSample" />
+		<property name="blockSize" 	value="10"/>
+		<property name="table"	   	value="IDS"/>
+		<property name="tableName"	value="SAMPLE"/>
+	</bean>
+	<bean name="mixPrefixSample" class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix"   value="SAMPLE-" />
+		<property name="cipers"   value="5" />
+		<property name="fillChar" value="0" />
+	</bean>	
+
+    <!-- 첨부파일 ID Generation  Config-->
+    <bean name="egovFileIdGnrService" class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+        <property name="dataSource" ref="dataSource" />
+        <property name="strategy" ref="fileStrategy" />
+        <property name="blockSize"  value="10"/>
+        <property name="table"      value="IDS"/>
+        <property name="tableName"  value="FILE_ID"/>
+    </bean>
+    <!-- 첨부파일 ID Generation  Strategy Config -->
+    <bean name="fileStrategy" class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+        <property name="prefix" value="FILE_" />
+        <property name="cipers" value="15" />
+        <property name="fillChar" value="0" />
+    </bean>
+
+    <!-- 회원가입 -->
+	<bean name="egovMembIdGnrService" class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="strategy" 	ref="membIdStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="IDS"/>
+		<property name="tableName"	value="TB_MEMB_ID_INFO"/>
+	</bean>
+	<bean name="membIdStrategy" class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix"   value="USER" />
+		<property name="cipers"   value="6" />
+		<property name="fillChar" value="0" />
+	</bean>	
+    <!-- 회원가입 -->
+
+    <!-- 한도요청ID -->
+	<bean name="egovReqIdGnrService" class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="strategy" 	ref="reqIdStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="IDS"/>
+		<property name="tableName"	value="TB_BUYER_LIMIT_REQUEST"/>
+	</bean>
+	<bean name="reqIdStrategy" class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix"   value="REQ" />
+		<property name="cipers"   value="16" />
+		<property name="fillChar" value="0" />
+	</bean>	
+    <!-- 한도요청 -->
+
+    <!-- 임시사업자번호 -->
+	<bean name="egovBizNoGnrService" class="egovframework.rte.fdl.idgnr.impl.EgovTableIdGnrServiceImpl" destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="strategy" 	ref="bizNoStrategy" />
+		<property name="blockSize" 	value="1"/>
+		<property name="table"	   	value="IDS"/>
+		<property name="tableName"	value="TEMP_BIZ_NO"/>
+	</bean>
+	<bean name="bizNoStrategy" class="egovframework.rte.fdl.idgnr.impl.strategy.EgovIdGnrStrategyImpl">
+		<property name="prefix"   value="" />
+		<property name="cipers"   value="10" />
+		<property name="fillChar" value="0" />
+	</bean>	
+    <!-- 한도요청 -->
+			
+</beans>

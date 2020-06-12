@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+		<typeAlias alias="searchVO" type="com.hyundai.sample.service.SampleDefaultVO"/>
+		<typeAlias alias="sampleVO" type="com.hyundai.sample.service.SampleVO"/>
+		<typeAlias alias="defaultVO" type="com.hyundai.cmmn.service.DefaultVO"/>
+		<typeAlias alias="memberVO" type="com.hyundai.admin.member.service.MemberVO"/>
+		<typeAlias alias="loginVO" type="com.hyundai.cmmn.service.LoginVO"/>
+		<typeAlias alias="registVO" type="com.hyundai.usr.service.RegistVO"/>
+		<typeAlias alias="fileVO" type="com.hyundai.cmmn.service.FileVO"/>
+
+		<!-- 대리점 -->
+		<typeAlias alias="buyerCompanysBillingVO" type="com.hyundai.buyer.companysBilling.service.CompanysBillingVO"/>
+		<typeAlias alias="buyerSalesBillingVO" type="com.hyundai.buyer.salesBilling.service.SalesBillingVO"/>
+		<typeAlias alias="buyerLimitVO" type="com.hyundai.buyer.salesBilling.service.BuyerLimitVO"/>
+		<typeAlias alias="dfrdAcntsRcvbleVO" type="com.hyundai.buyer.salesBilling.service.DfrdAcntsRcvbleVO"/>
+		<typeAlias alias="buyerOfficesItemVO" type="com.hyundai.buyer.officesItem.service.OfficesItemVO"/>
+		<typeAlias alias="buyerMyOfficesItemVO" type="com.hyundai.buyer.myOfficesItem.service.MyOfficesItemVO"/>
+		<typeAlias alias="buyerUnauthorizedVO" type="com.hyundai.buyer.unauthorized.service.UnauthorizedVO"/>
+		<typeAlias alias="buyerSetOffVO" type="com.hyundai.buyer.setOff.service.SetOffVO"/>
+		<typeAlias alias="buyerAccountReceivableVO" type="com.hyundai.buyer.accountReceivable.service.AccountReceivableVO"/>
+		<typeAlias alias="buyerReceivableChangeVO" type="com.hyundai.buyer.accountReceivable.service.ReceivableChangeVO"/>
+		<typeAlias alias="buyerPaymentVO" type="com.hyundai.buyer.payment.service.PaymentVO"/>
+		<typeAlias alias="buyerTaxBillVO" type="com.hyundai.buyer.taxBill.service.TaxBillVO"/>
+
+		<!-- 품목점 -->
+		<typeAlias alias="sellerOfficesItemVO" type="com.hyundai.seller.officesItem.service.OfficesItemVO"/>
+		<typeAlias alias="sellerMyOfficesItemVO" type="com.hyundai.seller.myOfficesItem.service.MyOfficesItemVO"/>
+		<typeAlias alias="sellerCompanysBillingVO" type="com.hyundai.seller.companysBilling.service.CompanysBillingVO"/>
+		<typeAlias alias="sellerSalesBillingVO" type="com.hyundai.seller.salesBilling.service.SalesBillingVO"/>
+		<typeAlias alias="sellerdfrdAcntsRcvbleVO" type="com.hyundai.seller.salesBilling.service.DfrdAcntsRcvbleVO"/>
+		<typeAlias alias="sellerChangeOrApproveVO" type="com.hyundai.seller.changeOrApprove.service.ChangeOrApproveVO"/>
+		<typeAlias alias="sellerUnauthorizedVO" type="com.hyundai.seller.unauthorized.service.UnauthorizedVO"/>
+		<typeAlias alias="sellerTaxBillVO" type="com.hyundai.seller.taxBill.service.TaxBillVO"/>
+		<typeAlias alias="sellerTaxBillStatusVO" type="com.hyundai.seller.taxBill.service.TaxBillStatusVO"/>
+		<typeAlias alias="sellerSetOffVO" type="com.hyundai.seller.setOff.service.SetOffVO"/>
+		<typeAlias alias="sellerLoanVO" type="com.hyundai.seller.loan.service.LoanVO"/>
+		<typeAlias alias="sellerPaymentVO" type="com.hyundai.seller.payment.service.PaymentVO"/>
+
+		<!-- 관리자 -->
+		<typeAlias alias="abnormalDailyVO" type="com.hyundai.admin.abnormalDaily.service.AbnormalDailyVO"/>
+		<typeAlias alias="abnormalHeeledSalesVO" type="com.hyundai.admin.abnormalHeeledSales.service.AbnormalHeeledSalesVO"/>
+		<typeAlias alias="guaranteeVO" type="com.hyundai.admin.guarantee.service.GuaranteeVO"/>
+		<typeAlias alias="extraCollectionVO" type="com.hyundai.admin.guarantee.service.ExtraCollectionVO"/>
+		<typeAlias alias="setOffInfoVO" type="com.hyundai.admin.guarantee.service.SetOffInfoVO"/>
+		<typeAlias alias="taxbillVO" type="com.hyundai.admin.guarantee.service.TaxbillVO"/>
+		<typeAlias alias="salesSlipVO" type="com.hyundai.admin.guarantee.service.SalesSlipVO"/>
+		<typeAlias alias="unissuedVO" type="com.hyundai.admin.guarantee.service.UnissuedVO"/>
+		<typeAlias alias="dfrdAcntsRcvbleVO" type="com.hyundai.buyer.salesBilling.service.DfrdAcntsRcvbleVO"/>
+		<typeAlias alias="limitInfoVO" type="com.hyundai.admin.limitInfo.service.LimitInfoVO"/>
+		<typeAlias alias="limitRequestVO" type="com.hyundai.admin.limitInfo.service.LimitRequestVO"/>
+		<typeAlias alias="limitHistoryVO" type="com.hyundai.admin.limitInfo.service.LimitHistoryVO"/>
+		<typeAlias alias="memberAuthVO" type="com.hyundai.admin.authorization.service.MemberAuthVO"/>
+		<typeAlias alias="menuAuthVO" type="com.hyundai.admin.authorization.service.MenuAuthVO"/>
+	</typeAliases>
+</configuration>
