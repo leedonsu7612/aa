@@ -20,6 +20,7 @@ import java.util.List;
 public interface AbnormalDailyService {
 	
 	
+	
 
 	/**
 	 * 일자별 이상거래 목록을 조회한다.
